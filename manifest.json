@@ -1,15 +1,23 @@
 {
   "short_name": "VerraPro",
-  "name": "VERRA PRO Inspection System",
+  "name": "نظام فيرا برو للتفتيش",
+  "description": "نظام إدارة وتفتيش الجودة والفروع - فيرا بيتزا",
   "icons": [
     {
-      "src": "https://verrapizza.github.io/verra/verralogo.png",
+      "src": "https://verrapizza.github.io/verra/verralogo.jpg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://verrapizza.github.io/verra/verralogo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpg"
     }
   ],
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#004b47",
   "background_color": "#ffffff"
 }
