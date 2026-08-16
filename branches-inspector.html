@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>نظام VERRA PRO - إشراف الفروع</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #f8fafc; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+    .verra-gradient { background: linear-gradient(135deg, #004b47 0%, #002b29 100%); }
+    .section-title { background: #e8f5ee; border-right: 8px solid #d1ba89; padding: 12px; border-radius: 10px; font-weight: 900; color: #004b47; margin: 20px 0 10px; cursor: pointer; }
+    .item-card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+    .ans-btn { width: 60px; height: 40px; border-radius: 8px; font-weight: 700; font-size: 10px; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
+    .btn-yes.active { background: #10b981 !important; color: white; border-color: #059669; }
+    .btn-no.active { background: #ef4444 !important; color: white; border-color: #dc2626; }
+    .btn-na.active { background: #64748b !important; color: white; }
+    .notes-input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #d1ba89; background: #fffdf5; font-size: 13px; outline: none; }
+    .photo-thumb { width: 75px; height: 75px; object-fit: cover; border-radius: 10px; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .del-img { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 50; }
+    .upload-btn { background: #e8f5ee; color: #004b47; padding: 8px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; border: 1px solid #c8ddd3; display: inline-flex; align-items: center; gap: 4px; }
+    .upload-btn-gallery { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    .sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-bottom: 2px solid #004b47; padding: 12px 15px; }
+    .nav-btn { padding: 5px 14px; border-radius: 8px; font-size: 10px; font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+    .logout-btn { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .home-btn { background: rgba(209, 186, 137, 0.2); color: #d1ba89; border: 1px solid rgba(209, 186, 137, 0.4); }
+    .preview-btn { background: #d1ba89 !important; color: #004b47 !important; font-weight: 900 !important; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_-10rTZAM_aJnYiyivMx-yQY7tU6l3K0",
+      authDomain: "verra-system-828f2.firebaseapp.com",
+      projectId: "verra-system-828f2",
+      storageBucket: "verra-system-828f2.firebasestorage.app",
+      messagingSenderId: "961104891607",
+      appId: "1:961104891607:web:5ffd3af4983a8b015b6a92"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const LOGO_URL = "https://verrapizza.github.io/inspection/verralogo.png";
+    const ADMIN_EMAIL = "ch3f.ramzi@gmail.com";
+
+    // البنود كما أرسلتها حرفياً بدون ترقيم تلقائي
+    const sectionsData = [
+      { 
+        title: "الواجهة والصالات | Front & Lounge", 
+        items: [
+          {id:1, q:"check the restaurant front section (restaurant front + entrance floor + thermometer + air curtain)\nتشيك قسم واجهة المطعم ( نظافة واجهة المطعم + أرضية المدخل + الستارة القماش + الستارة الهوائية + تشيك على اللوحة بداية ونهاية الدوام )"},
+          {id:2, q:"Check lounge section 1 (tables + Chairs + walls and floor + air conditioning)\nتشيك قسم صالة 1 ( طاولات + كراسي + جدران و الأرضية + تكيف + مكينة المعطر + طفايات )"},
+          {id:3, q:"check bathroom hall 1 (general cleaning + tissue machine + soap machine + perfume machine)\nتشيك الحمام صالة 1 ( نظافة عامة + مكينة المناديل + مكينة الصابون + مكينة المعطر + متابعة جدول النظافة )"},
+          {id:8, q:"Check lounge section 2 (tables + Chairs + walls and floor + air conditioning)\nتشيك قسم صالة 2 ( طاولات + كراسي + جدران والأرضية + تكيف + طفايات )"},
+          {id:9, q:"check bathroom hall 2 (general cleaning + tissue machine + soap machine + perfume machine)\nتشيك الحمام صالة 2 ( نظافة عامة + مكينة المناديل + مكينة الصابون + مكينة المعطر + متابعة جدول النظافة )"}
+        ]
+      },
+      { 
+        title: "قسم الإدارة والتشغيل | Admin & Operation", 
+        items: [
+          {id:4, q:"checks, the cashier department (net + phone + cashier + applications)\nتشيك قسم الكاشير ( نت + تلفون + متابعة عهدة الكاشير + تشيك على نظام فودو في الكاشير + التشيك على نظاف فيد اس + متابعة الدوامات في مواقع التطبيقات )"},
+          {id:5, q:"Monitor and Google Maps.\n( متابعة قوقل ماب )"},
+          {id:10, q:"Check and monitor all plants/trees in the branch, if available.\n( تشيك على الأشجار ومتابعتها بالكامل ان وجد في الفرع . )"},
+          {id:16, q:"Check attendance and leave تشيك ( كشف الحضور )"},
+          {id:17, q:"Has a meeting been conducted with all employees today?\n( هل تم الاجتماع مع جميع الموظفين اليوم )"},
+          {id:18, q:"Follow-up on branch supervisors' daily tasks\nمتابعة مهام مشرفين الفروع"}
+        ]
+      },
+      { 
+        title: "الإنتاج والمخزون | Production & Store", 
+        items: [
+          {id:6, q:"Check the juices section (check the mixers + Clean the Pepsi machine + The keratin of the Pepsi machine with the gas tube + juice chiller + dates)\nتشيك قسم العصائر ( تشيك الخلاطات + نظافة مكينة البيبسي + كراتين التابعة للمكينة مع الغاز + ثلاجة العصائر + تواريخ )"},
+          {id:7, q:"Check the store section (elevator + store arrangement + cleaning + stacking + date control + store under the stairs)\nتشيك قسم المستودع ( المصعد + ترتيب المستودع + نظافة + التكديس + مراقبة التواريخ + مستودع تحت الدرج مكة )"},
+          {id:11, q:"Check Restaurant, back side (general cleaning + air curtains)\nتشيك القسم الخلفي للمطعم ( نظافة عامة + ستاير هوائية + الغاز )"},
+          {id:13, q:"Send orders according to schedule\nرفع الطلبات حسب الجدول"},
+          {id:14, q:"check requests\nتشيك الطلبات"}
+        ]
+      },
+      { 
+        title: "العمال والمرافق | Staff & Facilities", 
+        items: [
+          {id:12, q:"Check the employees (personal hygiene * uniform hygiene * nails * smell * health certificate * masks * gloves * harnet)\nتشيك العمال ( النظافة الشخصية * نظافة اليونفرم * اظافر * ريحة * كرت البلدية * الكمام * قلفزات * هرنت )"},
+          {id:15, q:"General check (sanitary facilities + all lamps + tiles + Damaged or broken equipment + Damaged or broken tools)\nتشيك عام ( مرافق صحية + جميع اللمبات + البلاط + المكاين الخربانة او المكسرة + أدوات الخربانة او المكسرة )"}
+        ]
+      }
+    ];
+
+    const buildReportHTML = (branch, email, score, answers, notes, photos, signature) => {
+        return `
+          <div style="width: 750px; margin: 0 auto; padding: 40px; background: white; direction: rtl; font-family: sans-serif; text-align: right; box-sizing: border-box;">
+            <div style="text-align: center; border-bottom: 5px solid #004b47; padding-bottom: 15px; margin-bottom: 30px;">
+                <img src="${LOGO_URL}" style="height: 100px;" />
+                <h1 style="color: #004b47; font-size: 26px; font-weight: 900; margin: 10px 0;">تقرير إشراف الفروع الرسمي</h1>
+            </div>
+            <div style="background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1; line-height: 2.2">
+                    <p style="margin:0;"><b>🏢 المنشأة المستهدفة:</b> ${branch}</p>
+                    <p style="margin:0;"><b>👤 المشرف المسؤول:</b> ${email}</p>
+                    <p style="margin:0;"><b>📅 التاريخ والوقت:</b> ${new Date().toLocaleString('en-GB', { hour12: true })}</p>
+                </div>
+                <div style="width: 150px; text-align: center; border-right: 3px solid #004b47; padding-right: 15px;">
+                    <p style="color: #64748b; font-size: 11px;">معدل الامتثال</p>
+                    <div style="font-size: 40px; font-weight: 900; color: ${score >= 70 ? '#059669' : '#dc2626'}">${score}%</div>
+                </div>
+            </div>
+            ${sectionsData.map(sec => `
+              <div style="background: #e8f5ee; padding: 10px; margin-top: 20px; border-right: 6px solid #d1ba89; color: #004b47; font-weight: 900; font-size: 15px;">${sec.title}</div>
+              ${sec.items.map(i => {
+                const ans = answers[i.id]; const note = notes[i.id] || ""; const pics = photos[i.id] || [];
+                let status = ans === 'yes' ? 'مطابق ✅' : ans === 'no' ? 'مخالفة ❌' : 'N/A';
+                return `<div style="padding: 12px; border-bottom: 1px solid #eee; page-break-inside: avoid;">
+                    <p style="margin: 0; font-size: 13px; font-weight: bold; color: #1e293b; line-height:1.4;">${i.q.replace(/\n/g, '<br>')}</p>
+                    <p style="font-size: 11px; margin: 5px 0; font-weight: bold; color: ${ans==='no'?'#dc2626':'#059669'};">الحالة: ${status}</p>
+                    ${note ? `<div style="background: #fff9e6; padding: 6px; font-size: 10px; border: 1px solid #fde68a; margin-top: 5px;">ملاحظة: ${note}</div>` : ""}
+                    <div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px;">
+                      ${pics.map(p => `<img src="${p}" style="width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;" />`).join('')}
+                    </div>
+                </div>`;
+              }).join("")}
+            `).join("")}
+            <div style="margin-top: 50px; border-top: 4px solid #004b47; padding-top: 30px; page-break-inside: avoid;">
+                <p style="font-weight: 900; color: #004b47; font-size: 16px; margin-bottom: 20px;">توقيع المشرف المعتمد:</p>
+                <div style="text-align: right; width: 350px; height: 120px; border-bottom: 2px solid #004b47;">
+                  ${signature ? `<img src="${signature}" style="width: 100%; height: 100%; object-fit: contain; display: block;" />` : ""}
+                </div>
+            </div>
+          </div>`;
+    };
+
+    function App() {
+      const [user, setUser] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [submitting, setSubmitting] = useState(false);
+      const [branch, setBranch] = useState("");
+      const [branches, setBranches] = useState([]);
+      const [answers, setAnswers] = useState({});
+      const [notes, setNotes] = useState({});
+      const [photos, setPhotos] = useState({});
+      const [expanded, setExpanded] = useState(new Set([sectionsData[0].title]));
+      const canvasRef = useRef(null);
+      const sigPad = useRef(null);
+
+      useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async u => {
+            if (u) {
+                const authCheck = await db.collection("authorized_users").where("email", "==", u.email.toLowerCase()).get();
+                if (u.email === ADMIN_EMAIL || !authCheck.empty) {
+                    setUser(u);
+                    db.collection("branches").orderBy("name").onSnapshot(snap => setBranches(snap.docs.map(d => d.data().name)));
+                } else {
+                    alert("⏳ حسابك بانتظار تفعيل الآدمن.");
+                    auth.signOut();
+                }
+            } else { setUser(null); }
+            setLoading(false);
+        });
+        return () => unsubscribe();
+      }, []);
+
+      useEffect(() => { if (user && canvasRef.current) sigPad.current = new SignaturePad(canvasRef.current); }, [user]);
+
+      const compressImage = (base64Str) => {
+        return new Promise((resolve) => {
+          const img = new Image(); img.src = base64Str;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 400; const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.4));
+          };
+        });
+      };
+
+      const handlePhotoAction = async (id, e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          const compressed = await compressImage(ev.target.result);
+          setPhotos(prev => ({...prev, [id]: [...(prev[id] || []), compressed].slice(0, 3)}));
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const getScore = () => {
+        const vals = Object.values(answers);
+        const yes = vals.filter(v => v === 'yes').length;
+        const total = vals.filter(v => v !== 'na' && v !== undefined).length;
+        return total > 0 ? Math.round((yes / total) * 100) : 0;
+      };
+
+      const handlePreview = () => {
+        if (!branch) return alert("اختر المنشأة");
+        const signatureImg = sigPad.current && !sigPad.current.isEmpty() ? sigPad.current.toDataURL() : "";
+        const html = buildReportHTML(branch, user.email, getScore(), answers, notes, photos, signatureImg);
+        alert("جاري تجهيز المعاينة...");
+        html2pdf().from(html).set({ margin:0, filename:`Branches_${branch}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, useCORS:true, scrollY:0}, jsPDF:{unit:'mm', format:'a4'} }).save();
+      };
+
+      const handleFinalSubmit = async () => {
+          if(!branch) return alert("اختر الفرع");
+          if(submitting) return;
+          setSubmitting(true);
+          const score = getScore();
+          const reportId = Date.now();
+          const timestampStr = new Date().toLocaleString('en-GB', { hour12: true });
+
+          try {
+              let local = JSON.parse(localStorage.getItem('v2_reports')) || [];
+              local.unshift({ id: reportId, branch, score, inspector: user.email, date: timestampStr, isCrit: score < 70, type: "Branch Report" });
+              localStorage.setItem('v2_reports', JSON.stringify(local.slice(0, 20)));
+
+              await db.collection("inspections").add({ 
+                  id: reportId, branch, score, inspector: user.email, date: timestampStr, timestamp: reportId, isCrit: score < 70,
+                  signature: sigPad.current ? sigPad.current.toDataURL() : "", answers, notes, photos, type: "Branch Report"
+              });
+
+              alert("✅ تم الإرسال والمزامنة بنجاح!");
+              window.location.reload();
+          } catch (e) { alert("⚠️ خطأ في السحابة."); }
+          finally { setSubmitting(false); }
+      };
+
+      if (loading) return <div className="h-screen flex items-center justify-center font-bold text-[#004b47] animate-pulse text-2xl uppercase">Verifying System...</div>;
+      if (!user) return <Login auth={auth} logo={LOGO_URL} db={db} adminEmail={ADMIN_EMAIL} />;
+
+      return (
+        <div className="pb-40 text-right text-right">
+          <div className="verra-gradient p-12 text-center shadow-xl rounded-b-[4rem] relative">
+            <img src={LOGO_URL} className="h-32 mx-auto mb-4 drop-shadow-2xl text-right" />
+            <div className="flex flex-col items-center gap-3">
+                <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] text-white font-bold border border-white/10 uppercase tracking-tighter">👤 {user.email}</span>
+                <div className="flex gap-2">
+                    {user.email === ADMIN_EMAIL && <button onClick={() => window.location.href='index.html'} className="nav-btn home-btn">🏠 الرئيسية</button>}
+                    <button onClick={() => auth.signOut()} className="nav-btn logout-btn">تسجيل الخروج ↪</button>
+                </div>
+            </div>
+          </div>
+
+          <div className="sticky-header flex justify-between items-center shadow-lg">
+            <div className="text-right">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Score</p>
+              <p className="text-4xl font-black text-green-700 leading-none mt-1">{getScore()}%</p>
+            </div>
+            <div className="flex gap-2">
+                <button onClick={handlePreview} className="nav-btn preview-btn px-5 py-2.5 rounded-xl shadow transition">معاينة</button>
+                <button onClick={handleFinalSubmit} disabled={submitting} className={`${submitting ? 'bg-gray-400':'verra-gradient'} text-white px-5 py-2.5 rounded-xl font-black shadow-lg text-xs active:scale-95 transition`}>{submitting ? '...' : 'إرسال'}</button>
+            </div>
+          </div>
+
+          <main className="p-5 max-w-3xl mx-auto space-y-8 mt-4">
+            <div className="card p-7 border-r-[15px] border-green-800 shadow-xl">
+                <select className="w-full text-2xl font-black outline-none bg-transparent text-green-950 text-right" value={branch} onChange={e=>setBranch(e.target.value)}>
+                    <option value="">-- اختر المنشأة --</option>
+                    {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+            </div>
+
+            {sectionsData.map(sec => (
+              <div key={sec.title}>
+                <div className="section-title flex justify-between items-center px-6 py-4 shadow-sm" onClick={() => {
+                  const n = new Set(expanded); n.has(sec.title) ? n.delete(sec.title) : n.add(sec.title); setExpanded(n);
+                }}>
+                    <span className="text-lg">{sec.title}</span>
+                    <span className="text-xs font-bold uppercase">{expanded.has(sec.title) ? 'Hide ▲' : 'Show ▼'}</span>
+                </div>
+                {expanded.has(sec.title) && sec.items.map((i) => (
+                  <div key={i.id} className="item-card shadow-lg border border-gray-100">
+                    <p className="text-md font-bold text-green-950 mb-5 leading-relaxed text-right white-space-pre-line">{i.q}</p>
+                    <div className="flex gap-2 justify-end mb-6">
+                      <button onClick={()=>setAnswers({...answers, [i.id]:'yes'})} className={`ans-btn ${answers[i.id]==='yes'?'active btn-yes':''}`}>نعم</button>
+                      <button onClick={()=>setAnswers({...answers, [i.id]:'no'})} className={`ans-btn ${answers[i.id]==='no'?'active btn-no':''}`}>لا</button>
+                      <button onClick={()=>setAnswers({...answers, [i.id]:'na'})} className={`ans-btn ${answers[i.id]==='na'?'active btn-na':''}`}>N/A</button>
+                    </div>
+                    <textarea className="notes-input shadow-inner text-right p-4 rounded-xl" placeholder="الملاحظة..." value={notes[i.id]||""} onChange={e=>setNotes({...notes, [i.id]:e.target.value})} />
+                    
+                    <div className="mt-5 flex flex-wrap gap-3 items-center justify-end">
+                        <label className="upload-btn active:scale-95 shadow-md">📷 كاميرا<input type="file" className="hidden" accept="image/*" capture="environment" onChange={e => handlePhotoAction(i.id, e)} /></label>
+                        <label className="upload-btn active:scale-95 shadow-md" style={{background:'#eff6ff', color:'#1e40af'}}>🖼️ معرض<input type="file" className="hidden" accept="image/*" onChange={e => handlePhotoAction(i.id, e)} /></label>
+                        <div className="flex flex-wrap mr-auto">
+                          {(photos[i.id] || []).map((img, px) => (
+                            <div key={px} className="relative m-1">
+                              <img src={img} className="photo-thumb" /><div className="del-img" onClick={()=>setPhotos({...photos, [i.id]: photos[i.id].filter((_,x)=>x!==px)})}>×</div>
+                            </div>
+                          ))}
+                        </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            
+            <div className="card p-10 border-2 border-dashed border-gray-300 text-center shadow-inner">
+              <h3 className="font-black text-green-900 mb-6 uppercase text-sm italic border-b pb-2 text-center underline decoration-green-300 underline-offset-8 text-center">توقيع المفتش المعتمد</h3>
+              <canvas ref={canvasRef} className="sig-canvas w-full h-48 border border-gray-100 rounded-3xl bg-gray-50 shadow-inner"></canvas>
+              <button onClick={()=>sigPad.current.clear()} className="text-red-500 text-xs font-bold mt-5 underline">مسح التوقيع</button>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    function Login({ auth, logo, db, adminEmail }) {
+      const [email, setEmail] = useState(""); const [pass, setPass] = useState("");
+      const [isRegistering, setIsRegistering] = useState(false);
+      const [btnLoading, setBtnLoading] = useState(false);
+
+      const handleAuth = async (ev) => {
+          ev.preventDefault(); setBtnLoading(true);
+          try {
+              if (isRegistering) {
+                  await auth.createUserWithEmailAndPassword(email.toLowerCase().trim(), pass);
+                  await db.collection("pending_authorizations").add({ email: email.toLowerCase().trim(), requested_at: new Date().toLocaleString('en-GB') });
+                  alert("✅ تم إرسال الطلب. انتظر موافقة الآدمن.");
+                  auth.signOut(); setIsRegistering(false);
+              } else {
+                  const userCredential = await auth.signInWithEmailAndPassword(email.toLowerCase().trim(), pass);
+                  const user = userCredential.user;
+                  const authCheck = await db.collection("authorized_users").where("email", "==", user.email.toLowerCase()).get();
+                  if (user.email === adminEmail || !authCheck.empty) {} else { throw { code: 'auth/not-authorized' }; }
+              }
+          } catch (err) {
+              auth.signOut();
+              if (err.code === 'auth/user-not-found') alert("⚠️ الحساب غير مسجل.");
+              else if (err.code === 'auth/wrong-password') alert("⚠️ كلمة المرور خاطئة.");
+              else if (err.code === 'auth/not-authorized') alert("⏳ بانتظار تفعيل الآدمن.");
+              else alert("⚠️ خطأ: " + err.message);
+          } finally { setBtnLoading(false); }
+      };
+
+      return (
+        <div className="h-screen verra-gradient flex items-center justify-center p-6 text-right">
+           <form onSubmit={handleAuth} className="bg-white p-12 rounded-[4rem] shadow-2xl w-full max-w-sm text-center">
+              <div className="bg-white rounded-full p-1 shadow-lg w-28 h-28 mx-auto mb-6 flex items-center justify-center"><img src={logo} className="h-20 object-contain" /></div>
+              <h1 className="text-2xl font-black text-green-900 mb-10 italic uppercase">{isRegistering ? "Request Access" : "Login Hub"}</h1>
+              <input className="w-full border-2 p-5 rounded-2xl mb-4 text-right outline-none font-bold" placeholder="البريد الإلكتروني" value={email} onChange={v=>setEmail(v.target.value)} />
+              <input className="w-full border-2 p-5 rounded-2xl mb-8 text-right outline-none font-bold" type="password" placeholder="كلمة المرور" value={pass} onChange={v=>setPass(v.target.value)} />
+              <button type="submit" disabled={btnLoading} className="w-full bg-[#004b47] text-white font-bold py-5 rounded-3xl shadow-xl active:scale-95 transition text-xl mb-6">{btnLoading ? "جاري التحقق..." : (isRegistering ? "إرسال طلب" : "دخول")}</button>
+              <p onClick={() => setIsRegistering(!isRegistering)} className="text-xs font-bold text-gray-400 cursor-pointer underline decoration-[#d1ba89]">{isRegistering ? "لديك حساب؟ ادخل من هنا" : "ليس لديك حساب؟ اطلب انضمام"}</p>
+           </form>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

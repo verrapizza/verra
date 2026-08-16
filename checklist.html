@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>نظام VERRA PRO - تشيك ليست المساعدين</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #f8fafc; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+    .verra-gradient { background: linear-gradient(135deg, #004b47 0%, #002b29 100%); }
+    .section-title { background: #e8f5ee; border-right: 8px solid #d1ba89; padding: 12px; border-radius: 10px; font-weight: 900; color: #004b47; margin: 20px 0 10px; cursor: pointer; }
+    .item-card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+    .ans-btn { width: 60px; height: 40px; border-radius: 8px; font-weight: 700; font-size: 10px; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
+    .btn-yes.active { background: #10b981 !important; color: white; border-color: #059669; }
+    .btn-no.active { background: #ef4444 !important; color: white; border-color: #dc2626; }
+    .btn-na.active { background: #64748b !important; color: white; }
+    .notes-input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #d1ba89; background: #fffdf5; font-size: 13px; outline: none; }
+    .photo-thumb { width: 75px; height: 75px; object-fit: cover; border-radius: 10px; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .upload-btn { background: #e8f5ee; color: #004b47; padding: 8px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; border: 1px solid #c8ddd3; display: inline-flex; align-items: center; gap: 4px; }
+    .sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-bottom: 2px solid #004b47; padding: 12px 15px; }
+    .nav-btn { padding: 5px 14px; border-radius: 8px; font-size: 10px; font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+    .logout-btn { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .home-btn { background: rgba(209, 186, 137, 0.2); color: #d1ba89; border: 1px solid rgba(209, 186, 137, 0.4); }
+  </style>
+</head>
+<body class="text-right">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_-10rTZAM_aJnYiyivMx-yQY7tU6l3K0",
+      authDomain: "verra-system-828f2.firebaseapp.com",
+      projectId: "verra-system-828f2",
+      storageBucket: "verra-system-828f2.firebasestorage.app",
+      messagingSenderId: "961104891607",
+      appId: "1:961104891607:web:5ffd3af4983a8b015b6a92"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const LOGO_URL = "https://verrapizza.github.io/inspection/verralogo.png";
+    const ADMIN_MAIN = "ch3f.ramzi@gmail.com";
+
+    // البنود الـ 21 الكاملة
+    const sectionsData = [
+      { 
+        title: "الواجهة والصالات | Front & Lounges", 
+        items: [
+          {id:1, en:"check the restaurant front section (front + entrance floor + thermometer + air curtain)", ar:"تشيك قسم واجهة المطعم ( نظافة واجهة المطعم + أرضية المدخل + الستارة القماش + الستارة الهوائية + تشيك على اللوحة بداية ونهاية الدوام )"},
+          {id:2, en:"Check lounge section 1 (tables + Chairs + walls and floor + air conditioning)", ar:"تشيك قسم صالة 1 ( طاولات + كراسي + جدران و الأرضية + تكيف + مكينة المعطر + طفايات )"},
+          {id:3, en:"check bathroom hall 1 (general cleaning + tissue machine + soap machine + perfume machine)", ar:"تشيك الحمام صالة 1 ( نظافة عامة + مكينة المناديل + مكينة الصابون + مكينة المعطر + متابعة جدول النظافة )"},
+          {id:9, en:"Check lounge section 2 (tables + Chairs + walls and floor + air conditioning)", ar:"تشيك قسم صالة 2 ( طاولات + كراسي + جدران والأرضية + تكيف + طفايات )"},
+          {id:10, en:"check bathroom hall 2 (general cleaning + tissue machine + soap machine + perfume machine)", ar:"تشيك الحمام صالة 2 ( نظافة عامة + مكينة المناديل + مكينة الصابون + مكينة المعطر + متابعة جدول النظافة )"},
+          {id:11, en:"Check and monitor all plants/trees in the branch, if available.", ar:"تشيك على الأشجار ومتابعتها بالكامل ان وجد في الفرع ."}
+        ]
+      },
+      { 
+        title: "قسم المطبخ والإنتاج | Kitchen & Production", 
+        items: [
+          {id:4, en:"Check the pizza section (hygiene + dates + chillers control)", ar:"تشيك قسم البيتزا ( نظافة + تواريخ + مراقبة الثلاجات )"},
+          {id:12, en:"Check the kitchen department A (floor + walls + conditioning + Hoods + dates)", ar:"تشيك قسم المطبخ أ ( نظافة الأرضية والجدران + التكييف + الشفاطات + التواريخ + الأدوات والمعدات )"},
+          {id:13, en:"Check the kitchen department B (fridges/freezer temperature + food arrangement)", ar:"تشيك قسم المطبخ ب ( فحص حرارة الثلاجات والمجمدات + ترتيب الأغذية + ترتيب الأدوات )"},
+          {id:14, en:"Check the laundry section (cleaning + equipment + oil filters + dishwasher)", ar:"تشيك قسم الغسيل ( النظافة العامة + معدات الغسيل + فلاتر الزيت + ترتيب الأدوات + فحص غسالة الأطباق )"},
+          {id:15, en:"Check Restaurant, back side (general cleaning + air curtains)", ar:"تشيك القسم الخلفي للمطعم ( نظافة عامة + ستاير هوائية )"}
+        ]
+      },
+      { 
+        title: "الإدارة والتشغيل | Management & Operations", 
+        items: [
+          {id:5, en:"checks, the cashier department (net + phone + cashier + applications)", ar:"تشيك قسم الكاشير ( نت + تلفون + كاشير + تطبيقات )"},
+          {id:6, en:"Monitor the Dashboard and Google Maps.", ar:"متابعة لوحة التحكم وقوقل ماب"},
+          {id:7, en:"Check the juices section (mixers + Pepsi machine + gas tube + chiller + dates)", ar:"تشيك قسم العصائر ( الخلاطات + مكينة البيبسي + الغاز + ثلاجة العصائر + تواريخ )"},
+          {id:8, en:"Check store section (elevator + arrangement + cleaning + stacking + dates)", ar:"تشيك قسم المستودع ( المصعد + الترتيب + النظافة + التكديس + مراقبة التواريخ )"},
+          {id:17, en:"Send orders according to schedule", ar:"رفع الطلبات حسب الجدول"},
+          {id:18, en:"check requests", ar:"تشيك الطلبات"},
+          {id:20, en:"Check attendance and leave + Follow up financial covenant", ar:"تشيك كشف الحضور والانصراف + متابعة العهدة المالية"},
+          {id:21, en:"Has a meeting been conducted with all employees today?", ar:"هل تم الاجتماع مع جميع الموظفين اليوم؟"}
+        ]
+      },
+      { 
+        title: "الصيانة والإغلاق | Maintenance & Closing", 
+        items: [
+          {id:19, en:"General check (sanitary facilities + lamps + tiles + Damaged equipment/tools)", ar:"تشيك عام ( مرافق صحية + اللمبات + البلاط + المعدات أو الأدوات الخربانة )"},
+          {id:22, en:"Check the end-of-shift tasks (air conditioners + lights + signboard)", ar:"تشيك مهام نهاية الوردية ( جميع التكييفات + جميع لمبات المطعم + لوحة المطعم )"}
+        ]
+      }
+    ];
+
+    function App() {
+      const [user, setUser] = useState(null);
+      const [userRole, setUserRole] = useState("");
+      const [loading, setLoading] = useState(true);
+      const [submitting, setSubmitting] = useState(false);
+      const [branch, setBranch] = useState("");
+      const [branches, setBranches] = useState([]);
+      const [answers, setAnswers] = useState({});
+      const [notes, setNotes] = useState({});
+      const [photos, setPhotos] = useState({});
+      const [expanded, setExpanded] = useState(new Set([sectionsData[0].title]));
+      const canvasRef = useRef(null);
+      const sigPad = useRef(null);
+
+      // منطق التحقق المطور للسماح للآدمن بالبقاء
+      useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async u => {
+            if (u) {
+                const uEmail = u.email.toLowerCase().trim();
+                const authSnap = await db.collection("authorized_users").where("email", "==", uEmail).get();
+                
+                if (uEmail === ADMIN_MAIN || !authSnap.empty) {
+                    const role = uEmail === ADMIN_MAIN ? 'admin' : authSnap.docs[0].data().role;
+                    setUserRole(role);
+
+                    // مسموح للآدمن والمساعد بالبقاء
+                    if (role === 'admin' || role === 'assistant') {
+                        setUser(u);
+                        db.collection("branches").orderBy("name").onSnapshot(snap => setBranches(snap.docs.map(d => d.data().name)));
+                    } else if (role === 'quality') {
+                        window.location.href = "quality-inspection.html";
+                    } else if (role === 'supervisor') {
+                        window.location.href = "branches-inspector.html";
+                    }
+                } else {
+                    auth.signOut();
+                }
+            } else { setUser(null); }
+            setLoading(false);
+        });
+        return () => unsubscribe();
+      }, []);
+
+      useEffect(() => { if (user && canvasRef.current) sigPad.current = new SignaturePad(canvasRef.current); }, [user]);
+
+      const compressImage = (base64Str) => {
+        return new Promise((resolve) => {
+          const img = new Image(); img.src = base64Str;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 400; const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.35));
+          };
+        });
+      };
+
+      const handlePhotoAction = async (id, e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          const compressed = await compressImage(ev.target.result);
+          setPhotos(prev => ({...prev, [id]: [...(prev[id] || []), compressed].slice(0, 3)}));
+        };
+        reader.readAsDataURL(file);
+      };
+
+      const getScore = () => {
+        const vals = Object.values(answers);
+        const yes = vals.filter(v => v === 'yes').length;
+        const total = vals.filter(v => v !== 'na' && v !== undefined).length;
+        return total > 0 ? Math.round((yes / total) * 100) : 0;
+      };
+
+      const handlePreview = () => {
+        if (!branch) return alert("اختر الفرع أولاً");
+        const score = getScore();
+        const signatureImg = sigPad.current && !sigPad.current.isEmpty() ? sigPad.current.toDataURL() : "";
+        const timestamp = new Date().toLocaleString('en-GB', { hour12: true });
+
+        let reportContent = sectionsData.map(sec => {
+          let items = sec.items.map(i => {
+            const ans = answers[i.id]; const note = notes[i.id] || ""; const pics = photos[i.id] || [];
+            let status = "N/A"; let color = "#64748b";
+            if (ans === 'yes') { status = "مطابق ✅"; color = "#059669"; }
+            if (ans === 'no') { status = "مخالفة ❌"; color = "#dc2626"; }
+            return `
+              <div style="padding: 15px; border-bottom: 1px solid #f0f0f0; page-break-inside: avoid; text-align:right;">
+                <div style="direction: ltr; text-align: left; font-size: 11px; color: #666; margin-bottom: 5px;">${i.en}</div>
+                <div style="direction: rtl; text-align: right; font-size: 14px; font-weight: 900; color: #1e293b; line-height: 1.5;">${i.ar}</div>
+                <div style="margin-top: 10px;">
+                    <p style="font-size: 12px; font-weight: bold; color: ${color};">الحالة: ${status}</p>
+                    ${note ? `<div style="background: #fff9e6; padding: 10px; border-radius: 8px; font-size: 11px; margin-top: 10px;">الملاحظة: ${note}</div>` : ""}
+                    <div style="margin-top: 15px; text-align: right;">
+                        ${pics.map(p => `<img src="${p}" style="width: 140px; height: 140px; object-fit: cover; border-radius: 10px; margin: 5px;" />`).join('')}
+                    </div>
+                </div>
+              </div>`;
+          }).join("");
+          return `<div style="background: #f0fdf4; padding: 12px; margin-top: 25px; border-right: 8px solid #d1ba89; color: #004b47; font-weight: 900;">${sec.title}</div>${items}`;
+        }).join("");
+
+        const fullTemplate = `
+          <div style="width: 750px; margin: 0 auto; padding: 40px; background: white; direction: rtl; text-align: right;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="${LOGO_URL}" style="height: 90px;" />
+                <h1 style="color: #004b47; font-size: 28px; font-weight: 900; margin-top: 15px; border-bottom: 4px solid #d1ba89; display: inline-block; padding-bottom: 10px;">تقرير التدقيق الرسمي لـ "فيرا برو"</h1>
+            </div>
+            <div style="background: #f8fafc; padding: 25px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 40px; display: table; width: 100%;">
+                <div style="display: table-cell; width: 70%; line-height: 2.2; vertical-align: middle;">
+                    <p><b>🏢 المنشأة:</b> ${branch}</p>
+                    <p><b>👤 المسؤول:</b> ${user.email}</p>
+                    <p><b>📅 التاريخ:</b> ${timestamp}</p>
+                </div>
+                <div style="display: table-cell; width: 30%; text-align: center; border-right: 3px solid #004b47; vertical-align: middle;">
+                    <p style="color: #64748b; font-size: 12px; font-weight: bold;">الامتثال</p>
+                    <div style="font-size: 45px; font-weight: 900; color: ${score >= 70 ? '#059669' : '#dc2626'}">${score}%</div>
+                </div>
+            </div>
+            ${reportContent}
+            <div style="margin-top: 60px; border-top: 4px solid #004b47; padding-top: 30px; page-break-inside: avoid;">
+                <p style="font-weight: 900; color: #004b47; font-size: 16px;">توقيع المسؤول المعتمد:</p>
+                <img src="${signatureImg}" style="width: 280px; height: 100px; object-fit: contain;" />
+            </div>
+          </div>`;
+
+        html2pdf().from(fullTemplate).set({ margin:10, filename:`Report_${branch}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} }).save();
+      };
+
+      const handleFinalSubmit = async () => {
+          if(!branch) return alert("اختر الفرع أولاً");
+          if(submitting) return; setSubmitting(true);
+          const score = getScore(); const reportId = Date.now(); const timestampStr = new Date().toLocaleString('en-GB', { hour12: true });
+          try {
+              await db.collection("inspections").add({ id: reportId, branch, score, inspector: user.email, date: timestampStr, timestamp: reportId, isCrit: score < 70, signature: sigPad.current ? sigPad.current.toDataURL() : "", answers, notes, photos, type: "Assistant Checklist" });
+              alert("✅ تم الإرسال بنجاح!"); window.location.reload();
+          } catch (e) { alert("⚠️ خطأ في الإرسال."); } finally { setSubmitting(false); }
+      };
+
+      if (loading) return <div className="h-screen flex items-center justify-center font-bold text-[#004b47] animate-pulse">جاري التحميل...</div>;
+      if (!user) return <div className="h-screen flex items-center justify-center font-bold">يرجى تسجيل الدخول من البوابة الرئيسية.</div>;
+
+      return (
+        <div className="pb-40 text-right">
+          <div className="verra-gradient p-10 text-center shadow-xl rounded-b-[3rem]">
+            <img src={LOGO_URL} className="h-24 mx-auto mb-4" />
+            <div className="flex flex-col items-center gap-3">
+                <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] text-white">👤 {user.email}</span>
+                <div className="flex gap-2">
+                    {userRole === 'admin' && <button onClick={() => window.location.href='admin.html'} className="nav-btn home-btn">🏠 الرئيسية</button>}
+                    <button onClick={() => auth.signOut()} className="nav-btn logout-btn">خروج ↪</button>
+                </div>
+            </div>
+          </div>
+
+          <div className="sticky-header flex justify-between items-center shadow-md">
+            <div className="text-right"><p className="text-[10px] font-bold text-gray-400 uppercase">Score</p><p className="text-3xl font-black text-green-700 leading-none">{getScore()}%</p></div>
+            <div className="flex gap-2">
+                <button onClick={handlePreview} className="nav-btn preview-btn px-4 py-2 rounded-xl bg-[#d1ba89] text-[#004b47] font-black shadow">معاينة</button>
+                <button onClick={handleFinalSubmit} disabled={submitting} className={`${submitting ? 'bg-gray-400':'verra-gradient'} text-white px-5 py-2 rounded-xl font-black shadow-lg text-xs`}>{submitting ? '...' : 'إرسال'}</button>
+            </div>
+          </div>
+
+          <main className="p-5 max-w-3xl mx-auto space-y-6 text-right">
+            <div className="item-card p-6 border-r-[10px] border-[#004b47] shadow-xl">
+                <select className="w-full text-xl font-black outline-none bg-transparent text-right" value={branch} onChange={e=>setBranch(e.target.value)}>
+                    <option value="">-- اختر الفرع --</option>
+                    {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
+            </div>
+
+            {sectionsData.map(sec => (
+              <div key={sec.title}>
+                <div className="section-title flex justify-between items-center px-4" onClick={() => {
+                  const n = new Set(expanded); n.has(sec.title) ? n.delete(sec.title) : n.add(sec.title); setExpanded(n);
+                }}><span>{sec.title}</span><span>{expanded.has(sec.title) ? '▲' : '▼'}</span></div>
+                {expanded.has(sec.title) && sec.items.map((i) => (
+                  <div key={i.id} className="item-card shadow-md">
+                    <p className="text-[10px] text-gray-400 mb-1 text-left font-bold" style={{direction:'ltr'}}>{i.en}</p>
+                    <p className="text-sm font-black text-green-950 mb-4 leading-relaxed text-right">{i.ar}</p>
+                    <div className="flex gap-2 justify-end mb-4">
+                      <button onClick={()=>setAnswers({...answers, [i.id]:'yes'})} className={`ans-btn ${answers[i.id]==='yes'?'active btn-yes':''}`}>نعم</button>
+                      <button onClick={()=>setAnswers({...answers, [i.id]:'no'})} className={`ans-btn ${answers[i.id]==='no'?'active btn-no':''}`}>لا</button>
+                      <button onClick={()=>setAnswers({...answers, [i.id]:'na'})} className={`ans-btn ${answers[i.id]==='na'?'active btn-na':''}`}>N/A</button>
+                    </div>
+                    <textarea className="notes-input text-right" placeholder="ملاحظات إضافية..." value={notes[i.id]||""} onChange={e=>setNotes({...notes, [i.id]:e.target.value})} />
+                    <div className="mt-4 flex flex-wrap gap-2 items-center justify-end">
+                        <label className="upload-btn">📷 كاميرا<input type="file" className="hidden" accept="image/*" capture="environment" onChange={e => handlePhotoAction(i.id, e)} /></label>
+                        <label className="upload-btn" style={{background:'#eff6ff', color:'#1e40af'}}>🖼️ معرض<input type="file" className="hidden" accept="image/*" onChange={e => handlePhotoAction(i.id, e)} /></label>
+                        <div className="flex flex-wrap">{(photos[i.id] || []).map((img, px) => (<div key={px} className="relative m-1"><img src={img} className="photo-thumb shadow-sm" /><div className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]" onClick={()=>setPhotos({...photos, [i.id]: []})}>×</div></div>))}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div className="item-card p-8 border-2 border-dashed border-gray-300 text-center shadow-inner text-right">
+                <h3 className="font-black text-green-900 mb-4 text-center">توقيع المسؤول المعتمد</h3>
+                <canvas ref={canvasRef} className="sig-canvas w-full h-40 border rounded-2xl bg-gray-50"></canvas>
+                <button onClick={()=>sigPad.current.clear()} className="text-red-500 text-xs mt-3 underline">مسح التوقيع</button>
+            </div>
+          </main>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
