@@ -1,0 +1,15 @@
+{
+  "short_name": "VerraPro",
+  "name": "VERRA PRO Inspection System",
+  "icons": [
+    {
+      "src": "https://verrapizza.github.io/verra/verralogo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "theme_color": "#004b47",
+  "background_color": "#ffffff"
+}
