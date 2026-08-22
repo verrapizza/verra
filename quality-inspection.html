@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<!-- أضف هذه الأسطر تحت الـ <title> مباشرة -->
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="VerraPro">
-<link rel="apple-touch-icon" href="https://verrapizza.github.io/verra/verralogo.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>نظام VERRA PRO - مشرف الجودة</title>
+  <title>نظام VERRA PRO - مفتش الجودة</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -21,28 +15,23 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <style>
-    body { font-family: 'Cairo', sans-serif; background: #f8fafc; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Cairo', sans-serif; background: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
     .verra-gradient { background: linear-gradient(135deg, #004b47 0%, #002b29 100%); }
     .section-title { background: #e8f5ee; border-right: 8px solid #d1ba89; padding: 12px; border-radius: 10px; font-weight: 900; color: #004b47; margin: 20px 0 10px; cursor: pointer; }
-    .item-card { background: white; border-radius: 15px; padding: 18px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
-    .ans-btn { width: 55px; height: 40px; border-radius: 8px; font-weight: 700; font-size: 11px; background: #f1f5f9; border: 1px solid #e2e8f0; transition: 0.2s; }
-    .btn-yes.active { background: #10b981 !important; color: white; border-color: #059669; }
-    .btn-no.active { background: #ef4444 !important; color: white; border-color: #dc2626; }
+    .item-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .ans-btn { width: 55px; height: 40px; border-radius: 10px; font-weight: 700; font-size: 11px; background: #f1f5f9; transition: 0.2s; border: 1px solid #e2e8f0; }
+    .btn-yes.active { background: #10b981 !important; color: white; }
+    .btn-no.active { background: #ef4444 !important; color: white; }
     .btn-na.active { background: #64748b !important; color: white; }
-    .notes-input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #d1ba89; background: #fffdf5; font-size: 13px; outline: none; }
-    .photo-thumb { width: 75px; height: 75px; object-fit: cover; border-radius: 10px; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .del-img { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 50; }
-    .upload-btn { background: #e8f5ee; color: #004b47; padding: 8px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; cursor: pointer; border: 1px solid #c8ddd3; display: inline-flex; align-items: center; gap: 4px; }
-    .upload-btn-gallery { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-    .sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); border-bottom: 2px solid #004b47; padding: 12px 15px; }
-    .nav-btn { padding: 5px 14px; border-radius: 8px; font-size: 10px; font-weight: bold; transition: 0.3s; display: inline-flex; align-items: center; gap: 5px; }
-    .logout-btn { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .home-btn { background: rgba(209, 186, 137, 0.2); color: #d1ba89; border: 1px solid rgba(209, 186, 137, 0.4); }
-    .preview-btn { background: #d1ba89 !important; color: #004b47 !important; font-weight: 900 !important; }
+    .notes-input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #d1ba89; background: #fffdf5; font-size: 13px; outline: none; text-align: right; }
+    .photo-thumb { width: 65px; height: 65px; object-fit: cover; border-radius: 12px; border: 2px solid white; }
+    .sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #004b47; padding: 12px 15px; }
+    .upload-btn { background: #f8fafc; color: #475569; padding: 10px 14px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 6px; }
   </style>
 </head>
-<body>
+<body class="text-right">
   <div id="root"></div>
+
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
     const firebaseConfig = {
@@ -57,46 +46,49 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     const LOGO_URL = "https://verrapizza.github.io/inspection/verralogo.png";
-    const ADMIN_EMAIL = "ch3f.ramzi@gmail.com";
+    const ADMIN_MAIN = "ch3f.ramzi@gmail.com";
 
+    // البنود (مثال بـ 3 أقسام، يمكنك إضافة البقية)
     const sectionsData = [
-      { title: "الاستلام والتخزين", items: [{id:1,q:"فحص درجات حرارة المواد الغذائية الواردة عند التسليم"},{id:2,q:"درجة حرارة المجمدات لا تتجاوز -18°م عند الاستلام"},{id:3,q:"درجة حرارة المبردات لا تتجاوز 4°م عند الاستلام"},{id:4,q:"استخدام مقياس حرارة معاير للأغذية عالية الخطورة"},{id:5,q:"نقل الأغذية المبردة إلى التخزين خلال أقل من 20 دقيقة"},{id:6,q:"مطابقة المنتجات للمواصفات القياسية السعودية"},{id:7,q:"اللحوم الطازجة من مسالخ معتمدة ومختومة رسمياً"},{id:8,q:"التعبئة سليمة وخالية من الآفات أو التلف"},{id:9,q:"التحقق من تواريخ الصلاحية وتسجيلها عند الاستلام"},{id:10,q:"أماكن التخزين نظيفة وجافة وجيدة التهوية"}]},
-      { title: "تحضير الأغذية", items: [{id:11,q:"مراجعة ومتابعة بروسيس تحضير العجين"},{id:12,q:"متابعة بروسيس تكوير العجين"},{id:13,q:"مراجعة تحضير الصوصات"},{id:14,q:"فصل مناطق تحضير الأغذية النيئة عن المطبوخة"},{id:15,q:"منع التلوث الخلطي أثناء التحضير"},{id:16,q:"إذابة الأغذية في الثلاجة أو تحت ماء بارد جارٍ"},{id:17,q:"عدم ترك الأغذية المحضرة في حرارة الغرفة > ساعتين"},{id:18,q:"وصول درجات حرارة الطهي لـ (≥75°م)"},{id:19,q:"إعادة التسخين لدرجة حرارة لا تقل عن 75°م"},{id:20,q:"استخدام لوحات تقطيع ملونة لأنواع مختلفة"},{id:21,q:"ارتداء القفازات عند لمس الأغذية الجاهزة"}]},
-      { title: "جودة المنتج", items: [{id:22,q:"معاينة جودة المنتج النهائي (قسم الباستا)"},{id:23,q:"معاينة جودة المنتج النهائي (قسم البيتزا)"},{id:24,q:"رفع صورة المنتج النهائي على الواتساب في كل الفروع"}]},
-      { title: "المنشأة والبيئة", items: [{id:25,q:"المنشأة تقع بعيداً عن مصادر التلوث"},{id:26,q:"خلو الجدران والأرضيات والأسقف من التشققات"},{id:27,q:"الأبواب محكمة الإغلاق وتغلق تلقائياً"},{id:28,q:"النوافذ مزودة بشبكات معدنية سليمة"},{id:29,q:"ميل مناسب للصرف في جميع المناطق"},{id:30,q:"أجهزة التكييف فعالة وتعمل بشكل صحيح"},{id:31,q:"وجود شفاطات فوق الأفران والشوايات"},{id:32,q:"إضاءة كافية في جميع مناطق التعامل مع الأغذية"},{id:33,q:"الأرضيات مقاومة للماء وغير زلقة وسهلة التنظيف"}]},
-      { title: "التنظيف والتعقيم", items: [{id:34,q:"جدول التنظيف موثق ويتم اتباعه بدقة"},{id:35,q:"المطهرات آمنة للأغذية وبالتركيزات الصحيحة"},{id:36,q:"تنظيف وتعقيم المعدات بعد كل استخدام"},{id:37,q:"التنظيف العميق يومياً لجميع الأسطح الملامسة"},{id:38,q:"حاويات النفايات تفتح بالقدم وتفرغ بانتظام"},{id:39,q:"التخلص من النفايات يمنع تلوث المياه أو الأغذية"},{id:40,q:"عقد مكافحة آفات ساري مع شركة متخصصة"},{id:41,q:"عدم وجود دلائل على القوارض أو الحشرات"}]},
-      { title: "النظافة الشخصية", items: [{id:42,q:"جميع العاملين يرتدون زياً نظيفاً وأغطية للشعر"},{id:43,q:"ارتداء الكمامات في مناطق الأغذية القابلة للتلف"},{id:44,q:"محطات غسل اليدين مزودة بالصابون والماء الساخن"},{id:45,q:"غسل اليدين قبل التعامل مع الأغذية وبعد الاستراحة"},{id:46,q:"عدم ارتداء المجوهرات أو طلاء الأظافر"},{id:47,q:"فحوصات طبية قبل التوظيف من جهات معتمدة"},{id:48,q:"فحوصات طبية روتينية سنوية لجميع العاملين"},{id:49,q:"استبعاد العاملين المصابين بالأمراض المعدية"}]},
-      { title: "المعدات والأدوات", items: [{id:50,q:"المعدات مصنوعة من مواد مقاومة للتآكل وآمنة"},{id:51,q:"مقاييس الحرارة معايرة وتعمل بشكل صحيح"},{id:52,q:"الثلاجات والمجمدات تحافظ على درجات الحرارة المطلوبة"},{id:53,q:"تسجيل سجلات درجة الحرارة مرتين يومياً على الأقل"},{id:54,q:"صيانة وتنظيف معدات الطهي بانتظام"},{id:55,q:"أسطح ملامسة للأغذية ناعمة وخالية من التشققات"}]},
-      { title: "التتبيع والتوثيق", items: [{id:56,q:"الالتزام بسجلات مراقبة الجودة (ديفروست، تعقيم، زيت)"},{id:57,q:"رفع لوائح التشييك يومياً على مجموعة الواتساب"},{id:58,q:"دليل تتبع الأغذية متاح وكامل في المنشأة"},{id:59,q:"الاحتفاظ بسجلات التتبع 180 يوماً"},{id:60,q:"ترميز المنتجات لتحديد كل دفعة وتاريخ الإنتاج"},{id:61,q:"سجلات اعتماد الموردين والشهادات"},{id:62,q:"جميع العاملين يحملون شهادات صحية سارية"},{id:63,q:"خطة HACCP موثقة ومعتمدة"},{id:64,q:"سجلات التنظيف والتعقيم كاملة ومحدثة"},{id:65,q:"الاحتفاظ بسجلات مراقبة درجة الحرارة"}]},
-      { title: "إمداد المياه والسباكة", items: [{id:66,q:"إمداد مياه الشرب كافٍ ونظيف تماماً"},{id:67,q:"تركيب فلاتر المياه وتنظيفها وصيانتها"},{id:68,q:"عدم وجود تسربات في مواسير الصرف"},{id:69,q:"إغلاق فتحات الصرف أثناء ساعات العمل"},{id:70,q:"أحواض غسل اليدين مزودة بأجهزة تجفيف"}]},
-      { title: "إدارة مسببات الحساسية", items: [{id:71,q:"معلومات مسببات الحساسية كاملة على الملصقات"},{id:72,q:"مناطق تحضير منفصلة للأصناف الخالية من الحساسية"},{id:73,q:"أدوات مخصصة لتحضير الأغذية الخاصة"},{id:74,q:"تدريب الموظفين على مسببات الحساسية"}]}
+      {
+        title: "الاستلام والتخزين | Receiving",
+        items: [
+          { id: 1, en: "Temperature checking for incoming food", ar: "يتم فحص جميع المواد الغذائية الواردة لدرجة الحرارة عند التسليم" },
+          { id: 2, en: "Frozen food temperature (-18°C)", ar: "لا تتجاوز درجة حرارة المجمدات -18°م عند الاستلام" }
+        ]
+      },
+      {
+        title: "تحضير الأغذية | Prep",
+        items: [
+          { id: 11, en: "Dough prep review", ar: "مراجعة ومتابعة بروسيس تحضير العجين" },
+          { id: 12, en: "Dough balling follow-up", ar: "متابعة بروسيس تكوير العجين" }
+        ]
+      },
+      {
+        title: "جودة المنتج | Product Quality",
+        items: [
+          { id: 22, en: "Final product quality (Pasta)", ar: "معاينة جودة المنتج النهائي قسم الباستا" },
+          { id: 23, en: "Final product quality (Pizza)", ar: "معاينة جودة المنتج النهائي قسم البيتزا" }
+        ]
+      }
     ];
 
     function App() {
       const [user, setUser] = useState(null);
       const [loading, setLoading] = useState(true);
-      const [submitting, setSubmitting] = useState(false);
       const [branch, setBranch] = useState("");
       const [branches, setBranches] = useState([]);
       const [answers, setAnswers] = useState({});
       const [notes, setNotes] = useState({});
       const [photos, setPhotos] = useState({});
+      const [submitting, setSubmitting] = useState(false);
       const [expanded, setExpanded] = useState(new Set([sectionsData[0].title]));
       const canvasRef = useRef(null);
       const sigPad = useRef(null);
 
       useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async u => {
-            if (u) {
-                const authCheck = await db.collection("authorized_users").where("email", "==", u.email.toLowerCase()).get();
-                if (u.email === ADMIN_EMAIL || !authCheck.empty) {
-                    setUser(u);
-                    db.collection("branches").orderBy("name").onSnapshot(snap => setBranches(snap.docs.map(d => d.data().name)));
-                } else {
-                    alert("⏳ حسابك قيد المراجعة.");
-                    auth.signOut();
-                }
-            } else { setUser(null); }
+            if (u) { setUser(u); db.collection("branches").orderBy("name").onSnapshot(s => setBranches(s.docs.map(d => d.data().name))); }
             setLoading(false);
         });
         return () => unsubscribe();
@@ -104,143 +96,139 @@
 
       useEffect(() => { if (user && canvasRef.current) sigPad.current = new SignaturePad(canvasRef.current); }, [user]);
 
-      const compressImage = (base64Str) => {
+      const compressExtreme = (file) => {
         return new Promise((resolve) => {
-          const img = new Image(); img.src = base64Str;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 500; const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.4));
+          const reader = new FileReader(); reader.readAsDataURL(file);
+          reader.onload = (e) => {
+            const img = new Image(); img.src = e.target.result;
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_W = 180; const scale = MAX_W / img.width;
+              canvas.width = MAX_W; canvas.height = img.height * scale;
+              const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              resolve(canvas.toDataURL('image/jpeg', 0.1));
+            };
           };
         });
       };
 
-      const handlePhotoAction = async (id, e) => {
+      const handlePhoto = async (id, e) => {
         const file = e.target.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (ev) => {
-          const compressed = await compressImage(ev.target.result);
-          setPhotos(prev => ({...prev, [id]: [...(prev[id] || []), compressed].slice(0, 3)}));
-        };
-        reader.readAsDataURL(file);
+        const compressed = await compressExtreme(file);
+        setPhotos(prev => ({...prev, [id]: [...(prev[id] || []), compressed]}));
       };
 
-      const getScore = () => {
-        const vals = Object.values(answers);
-        const yes = vals.filter(v => v === 'yes').length;
-        const total = vals.filter(v => v !== 'na' && v !== undefined).length;
-        return total > 0 ? Math.round((yes / total) * 100) : 0;
-      };
-
+      // --- وظيفة المعاينة مع "فلترة الأقسام الفارغة" ---
       const handlePreview = () => {
-        if (!branch) return alert("اختر المنشأة");
-        const score = getScore();
-        const signatureImg = sigPad.current ? sigPad.current.toDataURL() : "";
-        const timestamp = new Date().toLocaleString('en-GB', { hour12: true });
+        if (!branch) return alert("اختر المنشأة أولاً");
+        const score = Math.round(Object.values(answers).filter(v => v === 'yes').length / (Object.values(answers).filter(v => v !== 'na').length || 1) * 100);
+        const signatureImg = sigPad.current && !sigPad.current.isEmpty() ? sigPad.current.toDataURL() : "";
+        const timestamp = new Date().toLocaleString('en-GB');
 
-        let reportContent = sectionsData.map(sec => {
-          let items = sec.items.map(i => {
-            const ans = answers[i.id]; const note = notes[i.id] || ""; const pics = photos[i.id] || [];
-            let status = ans === 'yes' ? 'مطابق ✅' : ans === 'no' ? 'مخالفة ❌' : 'N/A';
-            return `<div style="padding:12px; border-bottom:1px solid #eee; page-break-inside:avoid;"><p style="margin:0; font-size:13px; font-weight:bold;">${i.id}. ${i.q}</p><p style="font-size:11px; margin:5px 0;">الحالة: ${status}</p>${note ? `<div style="background:#fff9e6; padding:6px; font-size:10px;">${note}</div>`:""}<div style="margin-top:10px; display:flex; gap:5px;">${pics.map(p=>`<img src="${p}" style="width:140px; height:100px; object-fit:cover; border-radius:6px; border:1px solid #eee;"/>`).join('')}</div></div>`;
-          }).join("");
-          return `<div style="background:#e8f5ee; padding:10px; margin-top:20px; border-right:6px solid #d1ba89; color:#004b47; font-weight:900;">${sec.title}</div>${items}`;
-        }).join("");
+        // بناء المحتوى مع الفلترة: يظهر فقط القسم الذي تم الإجابة على بند واحد منه على الأقل
+        let reportHTML = "";
+        sectionsData.forEach(sec => {
+            const answeredInThisSection = sec.items.filter(i => answers[i.id]);
+            
+            if (answeredInThisSection.length > 0) {
+                // إضافة عنوان القسم فقط إذا كان هناك إجابات
+                reportHTML += `<div style="background:#f0fdf4; padding:10px; border-right:10px solid #d1ba89; color:#004b47; font-weight:bold; margin-top:25px; text-align:right; font-size:18px; clear:both; page-break-inside:avoid;">${sec.title}</div>`;
+                
+                answeredInThisSection.forEach(i => {
+                    const ans = answers[i.id];
+                    const note = notes[i.id] || "";
+                    const pics = photos[i.id] || [];
+                    const statusColor = ans === 'yes' ? '#1C780B' : ans === 'no' ? '#D91414' : '#64748b';
 
-        const fullTemplate = `<div style="width:750px; margin:0 auto; padding:40px; background:white; direction:rtl; font-family:sans-serif; text-align:right;"><div style="text-align:center; border-bottom:5px solid #004b47; padding-bottom:15px;"><img src="${LOGO_URL}" style="height:100px;"/><h1 style="color:#004b47; font-size:26px; font-weight:900;">تقرير تدقيق الجودة الرسمي</h1></div><div style="background:#f8fafc; padding:20px; border-radius:12px; margin:30px 0; display:flex; justify-content:space-between; align-items:center;"><div><p><b>🏢 المنشأة:</b> ${branch}</p><p><b>👤 المفتش:</b> ${user.email}</p><p><b>📅 التاريخ:</b> ${timestamp}</p></div><div style="width:150px; text-align:center; border-right:3px solid #004b47;"><p style="font-size:11px;">الامتثال</p><div style="font-size:40px; font-weight:900; color:${score>=70?'green':'red'}">${score}%</div></div></div>${reportContent}<div style="margin-top:50px; border-top:4px solid #004b47; padding-top:30px;"><p style="font-weight:900;">التوقيع:</p><img src="${signatureImg}" style="width:350px; height:120px; object-fit:contain; display:block;"/></div></div>`;
+                    reportHTML += `
+                    <div style="padding:15px; border-bottom:1px solid #f1f5f9; text-align:right; page-break-inside:avoid; display:block; clear:both; width:100%; box-sizing:border-box;">
+                        <div style="font-weight:900; font-size:14px; color:#1e293b; line-height:1.6; margin-bottom:10px;">${i.ar}</div>
+                        <div style="margin-bottom:10px;"><span style="font-size:12px; color:${statusColor}; font-weight:bold; background:${statusColor}10; padding:4px 12px; border-radius:6px;">الحالة: ${ans === 'yes' ? 'مطابق ✅' : 'مخالفة ❌'}</span></div>
+                        ${note ? `<div style="background:#fff9e6; padding:10px; border-radius:8px; font-size:11px; border:1px solid #fde68a; margin-bottom:15px; color:#92400e;"><b>الملاحظة:</b> ${note}</div>` : ""}
+                        <div style="width:100%; display:block; text-align:right; clear:both;">
+                            ${pics.map(p => `<div style="display:inline-block; width:30%; margin-left:1%; margin-bottom:10px;"><img src="${p}" style="width:100%; height:150px; object-fit:cover; border-radius:12px; border:2px solid #eee;" /></div>`).join('')}
+                        </div>
+                    </div>`;
+                });
+            }
+        });
 
-        alert("جاري تجهيز المعاينة...");
-        html2pdf().from(fullTemplate).set({ margin:0, filename:`Inspection_${branch}.pdf`, image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, useCORS:true, scrollY:0}, jsPDF:{unit:'mm', format:'a4'} }).save();
+        const htmlTemplate = `
+          <div style="width:800px; margin:0 auto; padding:40px; background:white; direction:rtl; text-align:right; font-family:sans-serif;">
+            <table style="width:100%; margin-bottom:20px;">
+                <tr>
+                    <td style="text-align:right;"><div style="color:#004b47; font-size:28px; font-weight:900; border-bottom:5px solid #d1ba89; display:inline-block;">تقرير تدقيق الجودة</div></td>
+                    <td style="text-align:left; width:120px;"><img src="${LOGO_URL}" style="height:80px;" /></td>
+                </tr>
+            </table>
+            <div style="background:#f8fafc; padding:25px; border-radius:20px; margin-bottom:30px; display:table; width:100%;">
+                <div style="display:table-cell; width:70%; line-height:2.2; vertical-align:middle;">
+                    <b>🏢 المنشأة:</b> ${branch}<br/>
+                    <b>👤 المسؤول:</b> ${user.email}<br/>
+                    <b>📅 التاريخ:</b> ${timestamp}
+                </div>
+                <div style="display:table-cell; width:30%; text-align:center; border-right:4px solid #004b47; vertical-align:middle;">
+                    <div style="font-size:14px; color:#64748b;">الامتثال</div>
+                    <div style="font-size:55px; font-weight:900; color:${score>=70?'#1C780B':'#D91414'};">${score}%</div>
+                </div>
+            </div>
+            ${reportHTML}
+            <div style="margin-top:50px; border-top:2px solid #eee; padding-top:20px; page-break-inside:avoid; text-align:right;">
+                <p style="font-weight:900; color:#004b47; font-size:20px;">توقيع المفتش:</p>
+                <div style="background:#fafafa; padding:15px; border-radius:20px; display:inline-block; border:1px solid #f1f5f9;"><img src="${signatureImg}" style="width:300px; height:120px; object-fit:contain;" /></div>
+            </div>
+          </div>`;
+
+        const opt = { margin:10, filename:`Quality_${branch}.pdf`, image:{type:'jpeg', quality:1.0}, html2canvas:{scale:1.0, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} };
+        alert("جاري إنشاء تقرير البنود المجاب عليها فقط...");
+        html2pdf().from(htmlTemplate).set(opt).save();
       };
 
-      const handleFinalSubmit = async () => {
-          if(!branch) return alert("اختر المنشأة");
-          if(submitting) return;
-          setSubmitting(true);
-          const score = getScore();
-          const reportId = Date.now();
-          const timestampStr = new Date().toLocaleString('en-GB', { hour12: true });
-
-          try {
-              await db.collection("inspections").add({ 
-                  id: reportId, branch, score, inspector: user.email, date: timestampStr, timestamp: reportId, isCrit: score < 70,
-                  signature: sigPad.current ? sigPad.current.toDataURL() : "", answers, notes, photos, type: "Quality Audit" 
-              });
-
-              let local = JSON.parse(localStorage.getItem('v2_reports')) || [];
-              local.unshift({ id: reportId, branch, score, inspector: user.email, date: timestampStr, isCrit: score < 70, type: "Quality Audit" });
-              localStorage.setItem('v2_reports', JSON.stringify(local.slice(0, 20)));
-
-              alert("✅ تم الإرسال والمزامنة بنجاح!");
-              window.location.reload();
-          } catch (e) { alert("⚠️ خطأ في السحابة."); }
-          finally { setSubmitting(false); }
-      };
-
-      if (loading) return <div className="h-screen flex items-center justify-center font-bold text-[#004b47] animate-pulse text-2xl uppercase tracking-widest">VERRA PRO Loading...</div>;
-      if (!user) return <Login auth={auth} logo={LOGO_URL} db={db} adminEmail={ADMIN_EMAIL} />;
+      if (loading) return <div className="h-screen flex items-center justify-center font-black animate-pulse">VERRA QUALITY SYSTEM...</div>;
+      if (!user) return <div className="p-20 text-center font-bold">يرجى تسجيل الدخول.</div>;
 
       return (
         <div className="pb-40 text-right">
-          <div className="verra-gradient p-12 text-center shadow-xl rounded-b-[4rem] relative">
-            <img src={LOGO_URL} className="h-32 mx-auto mb-4 drop-shadow-2xl" />
-            <div className="flex flex-col items-center gap-3 text-white">
-                <span className="bg-white/10 px-4 py-1 rounded-full text-[10px] font-bold border border-white/10 uppercase tracking-tighter text-center">👤 {user.email}</span>
-                <div className="flex gap-2">
-                    {user.email === ADMIN_EMAIL && <button onClick={() => window.location.href='index.html'} className="nav-btn home-btn">🏠 الرئيسية</button>}
-                    <button onClick={() => auth.signOut()} className="nav-btn logout-btn">تسجيل الخروج ↪</button>
-                </div>
-            </div>
+          <div className="verra-gradient p-10 text-center text-white rounded-b-[3.5rem] shadow-2xl">
+            <img src={LOGO_URL} className="h-20 mx-auto mb-4" />
+            <h1 className="text-2xl font-black">مراقب الجودة المعتمد</h1>
           </div>
 
           <div className="sticky-header flex justify-between items-center shadow-lg">
-            <div className="text-right">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Score</p>
-              <p className="text-4xl font-black text-green-700 leading-none mt-1">{getScore()}%</p>
-            </div>
+            <p className="text-3xl font-black text-green-700">{Math.round(Object.values(answers).filter(v => v === 'yes').length / (Object.values(answers).filter(v => v !== 'na').length || 1) * 100)}%</p>
             <div className="flex gap-2">
-                <button onClick={handlePreview} className="nav-btn preview-btn px-5 py-2.5 rounded-xl shadow transition">معاينة</button>
-                <button onClick={handleFinalSubmit} disabled={submitting} className={`${submitting ? 'bg-gray-400':'verra-gradient'} text-white px-5 py-2.5 rounded-xl font-black shadow-lg text-xs active:scale-95 transition`}>{submitting ? '...' : 'إرسال'}</button>
+                <button onClick={handlePreview} className="bg-[#d1ba89] text-[#004b47] px-4 py-2 rounded-xl font-bold text-xs shadow">PDF معاينة</button>
+                <button className="verra-gradient text-white px-5 py-2 rounded-xl font-bold text-xs shadow">إرسال</button>
             </div>
           </div>
 
-          <main className="p-5 max-w-3xl mx-auto space-y-8 mt-4">
-            <div className="card p-7 border-r-[15px] border-green-800 shadow-xl">
-                <select className="w-full text-2xl font-black outline-none bg-transparent text-green-950 text-right" value={branch} onChange={e=>setBranch(e.target.value)}>
-                    <option value="">-- اختر المنشأة --</option>
+          <main className="p-5 max-w-2xl mx-auto space-y-6">
+            <div className="item-card p-6 border-r-8 border-[#d1ba89]">
+                <select className="w-full text-xl font-black bg-transparent outline-none" value={branch} onChange={e=>setBranch(e.target.value)}>
+                    <option value="">-- اختر الفرع --</option>
                     {branches.map(b => <option key={b} value={b}>{b}</option>)}
                 </select>
             </div>
 
             {sectionsData.map(sec => (
               <div key={sec.title}>
-                <div className="section-title flex justify-between items-center px-6 py-4 shadow-sm" onClick={() => {
-                  const n = new Set(expanded); n.has(sec.title) ? n.delete(sec.title) : n.add(sec.title); setExpanded(n);
-                }}>
-                    <span className="text-lg">{sec.title}</span>
-                    <span className="text-xs font-bold uppercase">{expanded.has(sec.title) ? 'Hide ▲' : 'Show ▼'}</span>
+                <div className="section-title" onClick={() => { const n = new Set(expanded); n.has(sec.title) ? n.delete(sec.title) : n.add(sec.title); setExpanded(n); }}>
+                  {sec.title} {expanded.has(sec.title) ? '▲' : '▼'}
                 </div>
-                {expanded.has(sec.title) && sec.items.map((i) => (
-                  <div key={i.id} className="item-card shadow-lg border border-gray-100">
-                    <p className="text-md font-bold text-green-950 mb-5 leading-relaxed text-right">{i.id}. {i.q}</p>
-                    <div className="flex gap-2 justify-end mb-6">
+                {expanded.has(sec.title) && sec.items.map(i => (
+                  <div key={i.id} className="item-card">
+                    <p className="font-bold text-gray-800 mb-2 leading-relaxed">{i.ar}</p>
+                    <div className="flex gap-2 justify-end mb-4">
                       <button onClick={()=>setAnswers({...answers, [i.id]:'yes'})} className={`ans-btn ${answers[i.id]==='yes'?'active btn-yes':''}`}>نعم</button>
                       <button onClick={()=>setAnswers({...answers, [i.id]:'no'})} className={`ans-btn ${answers[i.id]==='no'?'active btn-no':''}`}>لا</button>
                       <button onClick={()=>setAnswers({...answers, [i.id]:'na'})} className={`ans-btn ${answers[i.id]==='na'?'active btn-na':''}`}>N/A</button>
                     </div>
-                    <textarea className="notes-input shadow-inner text-right p-4 rounded-xl" placeholder="الملاحظة..." value={notes[i.id]||""} onChange={e=>setNotes({...notes, [i.id]:e.target.value})} />
-                    
-                    <div className="mt-5 flex flex-wrap gap-3 items-center justify-end">
-                        <label className="upload-btn active:scale-95 shadow-md">📷 كاميرا<input type="file" className="hidden" accept="image/*" capture="environment" onChange={e => handlePhotoAction(i.id, e)} /></label>
-                        <label className="upload-btn active:scale-95 shadow-md" style={{background:'#eff6ff', color:'#1e40af'}}>🖼️ معرض<input type="file" className="hidden" accept="image/*" onChange={e => handlePhotoAction(i.id, e)} /></label>
+                    <textarea className="notes-input" placeholder="ملاحظات..." value={notes[i.id]||""} onChange={e=>setNotes({...notes, [i.id]:e.target.value})} />
+                    <div className="mt-4 flex flex-wrap gap-2 items-center justify-end">
+                        <label className="upload-btn">📷 إضافة صورة<input type="file" className="hidden" accept="image/*" onChange={e => handlePhoto(i.id, e)} /></label>
                         <div className="flex flex-wrap mr-auto">
-                          {(photos[i.id] || []).map((img, px) => (
-                            <div key={px} className="relative m-1">
-                              <img src={img} className="photo-thumb" /><div className="del-img" onClick={()=>setPhotos({...photos, [i.id]: photos[i.id].filter((_,x)=>x!==px)})}>×</div>
-                            </div>
+                          {(photos[i.id] || []).map((img, idx) => (
+                            <div key={idx} className="relative m-1"><img src={img} className="photo-thumb" /></div>
                           ))}
                         </div>
                     </div>
@@ -248,52 +236,13 @@
                 ))}
               </div>
             ))}
-            
-            <div className="card p-10 border-2 border-dashed border-gray-300 text-center shadow-inner">
-              <h3 className="font-black text-green-900 mb-6 uppercase text-sm italic border-b pb-2 text-center underline decoration-green-300 underline-offset-8">توقيع المفتش المعتمد</h3>
-              <canvas ref={canvasRef} className="sig-canvas w-full h-48 border border-gray-100 rounded-3xl bg-gray-50 shadow-inner"></canvas>
-              <button onClick={()=>sigPad.current.clear()} className="text-red-500 text-xs font-bold mt-5 underline">مسح التوقيع</button>
+
+            <div className="item-card p-10 border-2 border-dashed border-gray-300 text-center shadow-inner">
+                <h3 className="font-black text-green-900 mb-4">توقيع المفتش المعتمد</h3>
+                <canvas ref={canvasRef} className="w-full h-40 bg-gray-50 rounded-2xl border"></canvas>
+                <button onClick={()=>sigPad.current.clear()} className="text-red-500 text-xs mt-3 underline font-bold">مسح التوقيع</button>
             </div>
           </main>
-        </div>
-      );
-    }
-
-    function Login({ auth, logo, db, adminEmail }) {
-      const [email, setEmail] = useState(""); const [pass, setPass] = useState("");
-      const [isRegistering, setIsRegistering] = useState(false);
-      const [btnLoading, setBtnLoading] = useState(false);
-      const handleAuth = async (ev) => {
-          ev.preventDefault(); setBtnLoading(true);
-          try {
-              if (isRegistering) {
-                  await auth.createUserWithEmailAndPassword(email.toLowerCase().trim(), pass);
-                  await db.collection("pending_authorizations").add({ email: email.toLowerCase().trim(), requested_at: new Date().toLocaleString('en-GB') });
-                  alert("✅ تم إرسال الطلب."); auth.signOut(); setIsRegistering(false);
-              } else {
-                  const userCredential = await auth.signInWithEmailAndPassword(email.toLowerCase().trim(), pass);
-                  const user = userCredential.user;
-                  const authCheck = await db.collection("authorized_users").where("email", "==", user.email.toLowerCase()).get();
-                  if (user.email === adminEmail || !authCheck.empty) {} else { throw { code: 'auth/not-authorized' }; }
-              }
-          } catch (err) {
-              auth.signOut();
-              if (err.code === 'auth/user-not-found') alert("⚠️ غير مسجل.");
-              else if (err.code === 'auth/wrong-password') alert("⚠️ كلمة المرور خاطئة.");
-              else if (err.code === 'auth/not-authorized') alert("⏳ بانتظار التفعيل.");
-              else alert("⚠️ خطأ: " + err.message);
-          } finally { setBtnLoading(false); }
-      };
-      return (
-        <div className="h-screen verra-gradient flex items-center justify-center p-6 text-right">
-           <form onSubmit={handleAuth} className="bg-white p-12 rounded-[4rem] shadow-2xl w-full max-w-sm text-center">
-              <img src={logo} className="h-24 mx-auto mb-6 shadow-2xl rounded-full" />
-              <h1 className="text-2xl font-black text-green-900 mb-10 italic uppercase">{isRegistering ? "انضمام جديد" : "Login Hub"}</h1>
-              <input className="w-full border-2 p-5 rounded-2xl mb-4 text-right outline-none font-bold" placeholder="البريد الإلكتروني" value={email} onChange={v=>setEmail(v.target.value)} />
-              <input className="w-full border-2 p-5 rounded-2xl mb-8 text-right outline-none font-bold" type="password" placeholder="كلمة المرور" value={pass} onChange={v=>setPass(v.target.value)} />
-              <button type="submit" disabled={btnLoading} className="w-full bg-[#004b47] text-white font-bold py-4 rounded-2xl shadow-xl active:scale-95 transition mb-6">{btnLoading ? "جاري..." : (isRegistering ? "طلب تفعيل" : "دخول")}</button>
-              <p onClick={() => setIsRegistering(!isRegistering)} className="text-xs font-bold text-gray-400 cursor-pointer underline decoration-[#d1ba89]">{isRegistering ? "ادخل بحسابك" : "ليس لديك حساب؟ اطلب انضمام"}</p>
-           </form>
         </div>
       );
     }
