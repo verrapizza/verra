@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>VERRA PRO - نظام الجودة المطور</title>
+  <title>VERRA PRO - نظام الجودة الشامل</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -23,8 +23,10 @@
     .btn-yes.active { background: #10b981 !important; color: white; border-color: #059669; }
     .btn-no.active { background: #ef4444 !important; color: white; border-color: #dc2626; }
     .btn-na.active { background: #64748b !important; color: white; }
-    .photo-thumb { width: 65px; height: 65px; object-fit: cover; border-radius: 12px; border: 1px solid #ddd; }
+    .notes-input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #d1ba89; background: #fffdf5; font-size: 13px; outline: none; text-align: right; }
+    .photo-thumb { width: 65px; height: 65px; object-fit: cover; border-radius: 12px; border: 2px solid white; }
     .sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #004b47; padding: 12px 15px; }
+    .upload-btn { background: #f8fafc; color: #475569; padding: 10px 14px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 6px; }
   </style>
 </head>
 <body class="text-right">
@@ -32,6 +34,7 @@
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
+
     const firebaseConfig = {
       apiKey: "AIzaSyA_-10rTZAM_aJnYiyivMx-yQY7tU6l3K0",
       authDomain: "verra-system-828f2.firebaseapp.com",
@@ -44,60 +47,122 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     const LOGO_URL = "https://verrapizza.github.io/inspection/verralogo.png";
-    const ADMIN_MAIN = "ch3f.ramzi@gmail.com";
 
-    // البنود كاملة (الأقسام الرئيسية)
+    // --- قائمة الـ 74 بنداً كاملة ---
     const sectionsData = [
       {
-        title: "الاستلام والتخزين | Receiving",
+        title: "الاستلام | Receiving",
         items: [
-          { id: 1, ar: "فحص درجة حرارة المواد الواردة" },
-          { id: 2, ar: "المجمدات لا تتجاوز -18 درجة" },
-          { id: 3, ar: "المبردات لا تتجاوز 4 درجات" },
-          { id: 4, ar: "فحص الأغذية بميزان حرارة معاير" },
-          { id: 5, ar: "نقل المواد للتخزين خلال 20 دقيقة" },
+          { id: 1, ar: "فحص درجة حرارة الأغذية عند التسليم" },
+          { id: 2, ar: "حرارة المجمدات لا تتجاوز -18 درجة" },
+          { id: 3, ar: "حرارة المبردات لا تتجاوز 4 درجات" },
+          { id: 4, ar: "استخدام مقياس حرارة (ترمومتر) معاير" },
+          { id: 5, ar: "نقل الأغذية للتخزين خلال 20 دقيقة" },
           { id: 6, ar: "مطابقة المواصفات القياسية السعودية" },
-          { id: 7, ar: "اللحوم من مسالخ معتمدة" },
-          { id: 8, ar: "سلامة التعبئة والتغليف" },
-          { id: 9, ar: "التحقق من تواريخ الصلاحية" },
-          { id: 10, ar: "نظافة منطقة الاستلام" }
+          { id: 7, ar: "اللحوم من مصادر معتمدة ومختومة" },
+          { id: 8, ar: "سلامة العبوات وخلوها من التلف" },
+          { id: 9, ar: "التحقق من تاريخ الصلاحية عند الاستلام" },
+          { id: 10, ar: "نظافة شاحنات التوصيل والمنطقة" }
         ]
       },
       {
         title: "تحضير الأغذية | Prep",
         items: [
-          { id: 11, ar: "تحضير العجين حسب المعايير" },
-          { id: 12, ar: "عملية تكوير العجين" },
-          { id: 13, ar: "تحضير الصوصات" },
-          { id: 14, ar: "فصل النيئ عن المطبوخ" },
-          { id: 15, ar: "منع التلوث المتبادل" },
-          { id: 16, ar: "تذويب الثلج (Thawing) بطريقة صحيحة" },
-          { id: 17, ar: "عدم ترك الأكل في حرارة الغرفة > ساعتين" },
-          { id: 18, ar: "حرارة الطهي تصل لـ 75 درجة" },
-          { id: 19, ar: "إعادة التسخين لـ 75 درجة" },
-          { id: 20, ar: "استخدام ألواح تقطيع ملونة" },
-          { id: 21, ar: "ارتداء القفازات" }
+          { id: 11, ar: "مراجعة عملية تحضير العجين" },
+          { id: 12, ar: "متابعة عملية تكوير العجين" },
+          { id: 13, ar: "تحضير الصوصات حسب المعايير" },
+          { id: 14, ar: "فصل النيئ عن المطبوخ تماماً" },
+          { id: 15, ar: "منع التلوث المتبادل أثناء التحضير" },
+          { id: 16, ar: "تذويب الثلج بطريقة صحيحة" },
+          { id: 17, ar: "عدم ترك الأكل خارج الثلاجة > ساعتين" },
+          { id: 18, ar: "حرارة الطهي تصل لـ 75 درجة فأكثر" },
+          { id: 19, ar: "إعادة التسخين تصل لـ 75 درجة" },
+          { id: 20, ar: "استخدام ألواح التقطيع الملونة" },
+          { id: 21, ar: "ارتداء القفازات عند ملامسة الجاهز للأكل" }
         ]
       },
       {
         title: "جودة المنتج | Product Quality",
         items: [
-          { id: 22, ar: "جودة المنتج النهائي - باستا" },
-          { id: 23, ar: "جودة المنتج النهائي - بيتزا" },
-          { id: 24, ar: "التزام الشيفات برفع الصور للواتساب" }
+          { id: 22, ar: "جودة منتج الباستا النهائي" },
+          { id: 23, ar: "جودة منتج البيتزا النهائي" },
+          { id: 24, ar: "التزام الشيف برفع الصور للواتساب" }
         ]
       },
       {
-          title: "نظافة المنشأة والمعدات | Facility & Cleaning",
-          items: [
-              { id: 25, ar: "نظافة الأرضيات والجدران" },
-              { id: 26, ar: "نظافة الثلاجات والمجمدات" },
-              { id: 27, ar: "نظافة الأفران والمعدات الكبيرة" },
-              { id: 28, ar: "نظافة الطاولات والأسطح" },
-              { id: 29, ar: "نظافة الشفاطات وفلاتر الهواء" },
-              { id: 30, ar: "نظافة دورات المياه" }
-              // ... يمكنك إضافة بقية الـ 74 بنداً هنا بنفس التنسيق
-          ]
+        title: "المبنى والمرافق | Facility",
+        items: [
+          { id: 25, ar: "سلامة الأسقف ومنع التسربات" },
+          { id: 26, ar: "سلامة الجدران وخلوها من التشققات" },
+          { id: 27, ar: "سلامة ونظافة الأرضيات" },
+          { id: 28, ar: "كفاءة الإضاءة وحمايتها من الكسر" },
+          { id: 29, ar: "كفاءة التهوية وتكييف الهواء" },
+          { id: 30, ar: "خلو المنشأة من الآفات والحشرات" },
+          { id: 31, ar: "إغلاق فتحات الصرف الصحي بإحكام" },
+          { id: 32, ar: "توفر ستائر هوائية عند المداخل" },
+          { id: 33, ar: "نظافة وترتيب منطقة المستودع" },
+          { id: 34, ar: "سلامة الأبواب وإغلاقها التلقائي" }
+        ]
+      },
+      {
+        title: "المعدات والأدوات | Equipment",
+        items: [
+          { id: 35, ar: "نظافة وصيانة الأفران" },
+          { id: 36, ar: "نظافة الثلاجات والمجمدات من الداخل" },
+          { id: 37, ar: "سلامة موانع التسرب (Rubber) للثلاجات" },
+          { id: 38, ar: "كفاءة عمل غسالات الأطباق" },
+          { id: 39, ar: "نظافة أدوات التقطيع والسكاكين" },
+          { id: 40, ar: "صيانة مكائن القهوة والعصائر" },
+          { id: 41, ar: "نظافة فلاتر الشفاطات" },
+          { id: 42, ar: "توفير أوعية نفايات تفتح بالقدم" },
+          { id: 43, ar: "نظافة وحدات التخزين (الأرفف)" },
+          { id: 44, ar: "سلامة الأسلاك الكهربائية" }
+        ]
+      },
+      {
+        title: "النظافة والتطهير | Cleaning & Sanitation",
+        items: [
+          { id: 45, ar: "وجود جدول نظافة يومي معتمد" },
+          { id: 46, ar: "استخدام منظفات ومطهرات معتمدة" },
+          { id: 47, ar: "تخزين الكيماويات بعيداً عن الطعام" },
+          { id: 48, ar: "نظافة منطقة غسيل الأواني" },
+          { id: 49, ar: "تجفيف الأواني بالهواء (لا للمناشف)" },
+          { id: 50, ar: "نظافة دورات المياه للعمال" },
+          { id: 51, ar: "نظافة دورات المياه للزوار" },
+          { id: 52, ar: "توفر الصابون والمناديل الورقية" },
+          { id: 53, ar: "نظافة منطقة النفايات الخارجية" },
+          { id: 54, ar: "تطهير الأسطح الملامسة للطعام دورياً" },
+          { id: 55, ar: "خلو المنشأة من الروائح الكريهة" }
+        ]
+      },
+      {
+        title: "النظافة الشخصية | Personal Hygiene",
+        items: [
+          { id: 56, ar: "توفر الشهادات الصحية لجميع العمال" },
+          { id: 57, ar: "الالتزام بالزي الرسمي النظيف" },
+          { id: 58, ar: "تغطية الرأس (شبكة الشعر)" },
+          { id: 59, ar: "قص الأظافر ونظافة اليدين" },
+          { id: 60, ar: "عدم ارتداء الساعات أو المجوهرات" },
+          { id: 61, ar: "غسل اليدين بالطريقة الصحيحة" },
+          { id: 62, ar: "خلو العمال من الجروح المفتوحة" },
+          { id: 63, ar: "منع الأكل والتدخين في منطقة العمل" },
+          { id: 64, ar: "توفر خزانة ملابس خاصة للعمال" },
+          { id: 65, ar: "الالتزام بوضع الكمامات (عند الحاجة)" }
+        ]
+      },
+      {
+        title: "التخزين | Storage",
+        items: [
+          { id: 66, ar: "تطبيق قاعدة FIFO (ما يدخل أولاً يخرج أولاً)" },
+          { id: 67, ar: "رفع المواد عن الأرض 15 سم" },
+          { id: 68, ar: "وضع ملصقات البيانات والتواريخ" },
+          { id: 69, ar: "فصل الكيماويات عن المواد الغذائية" },
+          { id: 70, ar: "تخزين البيض في أسفل الثلاجة" },
+          { id: 71, ar: "عدم تكدّس المنتجات في الثلاجة" },
+          { id: 72, ar: "تغطية جميع الأغذية المخزنة" },
+          { id: 73, ar: "نظافة منطقة تخزين الكراتين" },
+          { id: 74, ar: "التخلص من المنتجات التالفة فوراً" }
+        ]
       }
     ];
 
@@ -109,7 +174,7 @@
       const [answers, setAnswers] = useState({});
       const [notes, setNotes] = useState({});
       const [photos, setPhotos] = useState({});
-      const [uploading, setUploading] = useState(false);
+      const [submitting, setSubmitting] = useState(false);
       const [expanded, setExpanded] = useState(new Set([sectionsData[0].title]));
       const canvasRef = useRef(null);
       const sigPad = useRef(null);
@@ -134,10 +199,10 @@
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              const MAX_W = 200; const scale = MAX_W / img.width;
+              const MAX_W = 180; const scale = MAX_W / img.width;
               canvas.width = MAX_W; canvas.height = img.height * scale;
               const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              resolve(canvas.toDataURL('image/jpeg', 0.15));
+              resolve(canvas.toDataURL('image/jpeg', 0.1));
             };
           };
         });
@@ -149,35 +214,28 @@
         setPhotos(prev => ({...prev, [id]: [...(prev[id] || []), compressed]}));
       };
 
-      // --- وظيفة الـ PDF الاحترافية (تظهر فقط ما تم الإجابة عليه) ---
+      // --- نظام الـ PDF الاحترافي (فلترة الأقسام الفارغة) ---
       const handlePreview = () => {
         if (!branch) return alert("اختر المنشأة أولاً");
         const score = Math.round(Object.values(answers).filter(v => v === 'yes').length / (Object.values(answers).filter(v => v !== 'na').length || 1) * 100);
-        const signatureImg = sigPad.current ? sigPad.current.toDataURL() : "";
+        const signatureImg = sigPad.current && !sigPad.current.isEmpty() ? sigPad.current.toDataURL() : "";
         const timestamp = new Date().toLocaleString('en-GB');
 
         let reportHTML = "";
         sectionsData.forEach(sec => {
-            const answeredItems = sec.items.filter(i => answers[i.id]);
-            
-            if (answeredItems.length > 0) {
-                // إضافة عنوان القسم
+            const answeredInSec = sec.items.filter(i => answers[i.id]);
+            if (answeredInSec.length > 0) {
                 reportHTML += `<div style="background:#f0fdf4; padding:10px; border-right:10px solid #d1ba89; color:#004b47; font-weight:bold; margin-top:25px; text-align:right; font-size:18px; clear:both; page-break-inside:avoid;">${sec.title}</div>`;
-                
-                // إضافة البنود المجاب عليها فقط
-                answeredItems.forEach(i => {
-                    const ans = answers[i.id];
-                    const note = notes[i.id] || "";
-                    const pics = photos[i.id] || [];
+                answeredInSec.forEach(i => {
+                    const ans = answers[i.id]; const note = notes[i.id] || ""; const pics = photos[i.id] || [];
                     const statusColor = ans === 'yes' ? '#1C780B' : ans === 'no' ? '#D91414' : '#64748b';
-
                     reportHTML += `
-                    <div style="padding:15px; border-bottom: 1px solid #f1f5f9; text-align: right; page-break-inside: avoid; display: block; clear: both; width: 100%;">
-                        <div style="font-weight:900; font-size:14px; color:#1e293b; line-height:1.6; margin-bottom:10px;">${i.ar}</div>
-                        <div style="margin-bottom:10px;"><span style="font-size:12px; color:${statusColor}; font-weight:bold; background:${statusColor}10; padding:4px 12px; border-radius:6px;">الحالة: ${ans === 'yes' ? 'مطابق ✅' : 'مخالفة ❌'}</span></div>
-                        ${note ? `<div style="background:#fff9e6; padding:10px; border-radius:8px; font-size:11px; border:1px solid #fde68a; margin-bottom:15px; color:#92400e;"><b>الملاحظة:</b> ${note}</div>` : ""}
+                    <div style="padding:15px; border-bottom:1px solid #f1f5f9; text-align:right; page-break-inside:avoid; display:block; clear:both; width:100%;">
+                        <div style="font-weight:900; font-size:14px; color:#1e293b; line-height:1.6; margin-bottom:10px;">${i.id}. ${i.ar}</div>
+                        <div style="margin-bottom:10px;"><span style="font-size:12px; color:${statusColor}; font-weight:bold; background:${statusColor}10; padding:4px 12px; border-radius:6px;">الحالة: ${ans==='yes'?'مطابق':'مخالفة'}</span></div>
+                        ${note ? `<div style="background:#fff9e6; padding:10px; border-radius:8px; font-size:11px; margin-bottom:15px;"><b>ملاحظة:</b> ${note}</div>` : ""}
                         <div style="width:100%; display:block;">
-                            ${pics.map(p => `<div style="display:inline-block; width:30%; margin-left:1%; margin-bottom:10px;"><img src="${p}" style="width:100%; height:150px; object-fit:cover; border-radius:12px; border:2px solid #eee;" /></div>`).join('')}
+                            ${pics.map(p => `<div style="display:inline-block; width:30%; margin:1%;"><img src="${p}" style="width:100%; height:150px; object-fit:cover; border-radius:12px; border:2px solid #eee;" /></div>`).join('')}
                         </div>
                     </div>`;
                 });
@@ -186,36 +244,29 @@
 
         const htmlTemplate = `
           <div style="width:800px; margin:0 auto; padding:40px; background:white; direction:rtl; text-align:right; font-family:sans-serif;">
-            <table style="width:100%; margin-bottom:20px;">
-                <tr>
-                    <td style="text-align:right;"><div style="color:#004b47; font-size:32px; font-weight:900; border-bottom:5px solid #d1ba89; display:inline-block; padding-bottom:10px;">تقرير تدقيق الجودة الرسمي</div></td>
-                    <td style="text-align:left; width:120px;"><img src="${LOGO_URL}" style="height:80px;" /></td>
-                </tr>
-            </table>
+            <div style="text-align:center; margin-bottom:30px; display:table; width:100%;">
+                <div style="display:table-cell; text-align:right; vertical-align:middle;"><div style="color:#004b47; font-size:28px; font-weight:900; border-bottom:5px solid #d1ba89; display:inline-block; padding-bottom:10px;">تقرير تدقيق الجودة الرسمي</div></div>
+                <div style="display:table-cell; text-align:left; width:120px;"><img src="${LOGO_URL}" style="height:80px;" /></div>
+            </div>
             <div style="background:#f8fafc; padding:25px; border-radius:20px; margin-bottom:30px; display:table; width:100%;">
                 <div style="display:table-cell; width:70%; line-height:2.2; vertical-align:middle;">
-                    <b>🏢 المنشأة:</b> ${branch}<br/>
-                    <b>👤 المسؤول:</b> ${user.email}<br/>
-                    <b>📅 التاريخ:</b> ${timestamp}
+                    <b>🏢 المنشأة:</b> ${branch}<br/><b>👤 المسؤول:</b> ${user.email}<br/><b>📅 التاريخ:</b> ${timestamp}
                 </div>
                 <div style="display:table-cell; width:30%; text-align:center; border-right:4px solid #004b47; vertical-align:middle;">
-                    <div style="font-size:14px; color:#64748b;">الامتثال</div>
-                    <div style="font-size:55px; font-weight:900; color:${score>=70?'#1C780B':'#D91414'};">${score}%</div>
+                    <div style="font-size:14px; color:#64748b;">الامتثال</div><div style="font-size:55px; font-weight:900; color:${score>=70?'#1C780B':'#D91414'};">${score}%</div>
                 </div>
             </div>
             ${reportHTML}
             <div style="margin-top:50px; border-top:2px solid #eee; padding-top:20px; page-break-inside:avoid; text-align:right;">
-                <p style="font-weight:900; color:#004b47; font-size:20px;">توقيع المفتش:</p>
+                <p style="font-weight:900; color:#004b47; font-size:20px;">توقيع المفتش المعتمد:</p>
                 <div style="background:#fafafa; padding:15px; border-radius:20px; display:inline-block; border:1px solid #f1f5f9;"><img src="${signatureImg}" style="width:300px; height:120px; object-fit:contain;" /></div>
             </div>
           </div>`;
 
-        const opt = { margin:10, filename:`Quality_Report.pdf`, image:{type:'jpeg', quality:1.0}, html2canvas:{scale:1.0, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} };
-        alert("جاري إنشاء التقرير المفلتر...");
-        html2pdf().from(htmlTemplate).set(opt).save();
+        html2pdf().from(htmlTemplate).set({ margin:10, filename:`Quality_${branch}.pdf`, image:{type:'jpeg', quality:1.0}, html2canvas:{scale:1.0, useCORS:true}, jsPDF:{unit:'mm', format:'a4'} }).save();
       };
 
-      if (loading) return <div className="h-screen flex items-center justify-center font-black animate-pulse text-[#004b47]">VERRA QUALITY...</div>;
+      if (loading) return <div className="h-screen flex items-center justify-center font-black animate-pulse">جاري التحميل...</div>;
       if (!user) return <div className="p-20 text-center font-bold">يرجى تسجيل الدخول.</div>;
 
       return (
@@ -243,12 +294,12 @@
 
             {sectionsData.map(sec => (
               <div key={sec.title}>
-                <div className="section-title" onClick={() => { const n = new Set(expanded); n.has(sec.title) ? n.delete(sec.title) : n.add(sec.title); setExpanded(n); }}>
-                  {sec.title} {expanded.has(sec.title) ? '▲' : '▼'}
+                <div className="section-title flex justify-between" onClick={() => { const n = new Set(expanded); n.has(sec.title) ? n.delete(sec.title) : n.add(sec.title); setExpanded(n); }}>
+                  <span>{sec.title}</span> <span>{expanded.has(sec.title) ? '▲' : '▼'}</span>
                 </div>
                 {expanded.has(sec.title) && sec.items.map(i => (
                   <div key={i.id} className="item-card">
-                    <p className="font-bold text-gray-800 mb-2 leading-relaxed">{i.id}. {i.ar}</p>
+                    <p className="font-bold text-gray-800 mb-4">{i.id}. {i.ar}</p>
                     <div className="flex gap-2 justify-end mb-4">
                       <button onClick={()=>setAnswers({...answers, [i.id]:'yes'})} className={`ans-btn ${answers[i.id]==='yes'?'active btn-yes':''}`}>نعم</button>
                       <button onClick={()=>setAnswers({...answers, [i.id]:'no'})} className={`ans-btn ${answers[i.id]==='no'?'active btn-no':''}`}>لا</button>
@@ -267,7 +318,7 @@
                 ))}
               </div>
             ))}
-            
+
             <div className="item-card p-10 border-2 border-dashed border-gray-300 text-center shadow-inner">
                 <h3 className="font-black text-green-900 mb-4">توقيع المفتش المعتمد</h3>
                 <canvas ref={canvasRef} className="w-full h-40 bg-gray-50 rounded-2xl border"></canvas>
