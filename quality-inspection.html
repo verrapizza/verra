@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>نظام VERRA PRO - مفتش الجودة</title>
+  <title>VERRA PRO - نظام الجودة المطور</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -19,14 +19,12 @@
     .verra-gradient { background: linear-gradient(135deg, #004b47 0%, #002b29 100%); }
     .section-title { background: #e8f5ee; border-right: 8px solid #d1ba89; padding: 12px; border-radius: 10px; font-weight: 900; color: #004b47; margin: 20px 0 10px; cursor: pointer; }
     .item-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid #e2e8f0; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
-    .ans-btn { width: 55px; height: 40px; border-radius: 10px; font-weight: 700; font-size: 11px; background: #f1f5f9; transition: 0.2s; border: 1px solid #e2e8f0; }
-    .btn-yes.active { background: #10b981 !important; color: white; }
-    .btn-no.active { background: #ef4444 !important; color: white; }
+    .ans-btn { width: 55px; height: 40px; border-radius: 10px; font-weight: 700; font-size: 11px; background: #f1f5f9; border: 1px solid #e2e8f0; }
+    .btn-yes.active { background: #10b981 !important; color: white; border-color: #059669; }
+    .btn-no.active { background: #ef4444 !important; color: white; border-color: #dc2626; }
     .btn-na.active { background: #64748b !important; color: white; }
-    .notes-input { width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid #d1ba89; background: #fffdf5; font-size: 13px; outline: none; text-align: right; }
-    .photo-thumb { width: 65px; height: 65px; object-fit: cover; border-radius: 12px; border: 2px solid white; }
+    .photo-thumb { width: 65px; height: 65px; object-fit: cover; border-radius: 12px; border: 1px solid #ddd; }
     .sticky-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #004b47; padding: 12px 15px; }
-    .upload-btn { background: #f8fafc; color: #475569; padding: 10px 14px; border-radius: 12px; font-size: 11px; font-weight: bold; cursor: pointer; border: 1px solid #e2e8f0; display: inline-flex; align-items: center; gap: 6px; }
   </style>
 </head>
 <body class="text-right">
@@ -48,28 +46,58 @@
     const LOGO_URL = "https://verrapizza.github.io/inspection/verralogo.png";
     const ADMIN_MAIN = "ch3f.ramzi@gmail.com";
 
-    // البنود (مثال بـ 3 أقسام، يمكنك إضافة البقية)
+    // البنود كاملة (الأقسام الرئيسية)
     const sectionsData = [
       {
         title: "الاستلام والتخزين | Receiving",
         items: [
-          { id: 1, en: "Temperature checking for incoming food", ar: "يتم فحص جميع المواد الغذائية الواردة لدرجة الحرارة عند التسليم" },
-          { id: 2, en: "Frozen food temperature (-18°C)", ar: "لا تتجاوز درجة حرارة المجمدات -18°م عند الاستلام" }
+          { id: 1, ar: "فحص درجة حرارة المواد الواردة" },
+          { id: 2, ar: "المجمدات لا تتجاوز -18 درجة" },
+          { id: 3, ar: "المبردات لا تتجاوز 4 درجات" },
+          { id: 4, ar: "فحص الأغذية بميزان حرارة معاير" },
+          { id: 5, ar: "نقل المواد للتخزين خلال 20 دقيقة" },
+          { id: 6, ar: "مطابقة المواصفات القياسية السعودية" },
+          { id: 7, ar: "اللحوم من مسالخ معتمدة" },
+          { id: 8, ar: "سلامة التعبئة والتغليف" },
+          { id: 9, ar: "التحقق من تواريخ الصلاحية" },
+          { id: 10, ar: "نظافة منطقة الاستلام" }
         ]
       },
       {
         title: "تحضير الأغذية | Prep",
         items: [
-          { id: 11, en: "Dough prep review", ar: "مراجعة ومتابعة بروسيس تحضير العجين" },
-          { id: 12, en: "Dough balling follow-up", ar: "متابعة بروسيس تكوير العجين" }
+          { id: 11, ar: "تحضير العجين حسب المعايير" },
+          { id: 12, ar: "عملية تكوير العجين" },
+          { id: 13, ar: "تحضير الصوصات" },
+          { id: 14, ar: "فصل النيئ عن المطبوخ" },
+          { id: 15, ar: "منع التلوث المتبادل" },
+          { id: 16, ar: "تذويب الثلج (Thawing) بطريقة صحيحة" },
+          { id: 17, ar: "عدم ترك الأكل في حرارة الغرفة > ساعتين" },
+          { id: 18, ar: "حرارة الطهي تصل لـ 75 درجة" },
+          { id: 19, ar: "إعادة التسخين لـ 75 درجة" },
+          { id: 20, ar: "استخدام ألواح تقطيع ملونة" },
+          { id: 21, ar: "ارتداء القفازات" }
         ]
       },
       {
         title: "جودة المنتج | Product Quality",
         items: [
-          { id: 22, en: "Final product quality (Pasta)", ar: "معاينة جودة المنتج النهائي قسم الباستا" },
-          { id: 23, en: "Final product quality (Pizza)", ar: "معاينة جودة المنتج النهائي قسم البيتزا" }
+          { id: 22, ar: "جودة المنتج النهائي - باستا" },
+          { id: 23, ar: "جودة المنتج النهائي - بيتزا" },
+          { id: 24, ar: "التزام الشيفات برفع الصور للواتساب" }
         ]
+      },
+      {
+          title: "نظافة المنشأة والمعدات | Facility & Cleaning",
+          items: [
+              { id: 25, ar: "نظافة الأرضيات والجدران" },
+              { id: 26, ar: "نظافة الثلاجات والمجمدات" },
+              { id: 27, ar: "نظافة الأفران والمعدات الكبيرة" },
+              { id: 28, ar: "نظافة الطاولات والأسطح" },
+              { id: 29, ar: "نظافة الشفاطات وفلاتر الهواء" },
+              { id: 30, ar: "نظافة دورات المياه" }
+              // ... يمكنك إضافة بقية الـ 74 بنداً هنا بنفس التنسيق
+          ]
       }
     ];
 
@@ -81,14 +109,17 @@
       const [answers, setAnswers] = useState({});
       const [notes, setNotes] = useState({});
       const [photos, setPhotos] = useState({});
-      const [submitting, setSubmitting] = useState(false);
+      const [uploading, setUploading] = useState(false);
       const [expanded, setExpanded] = useState(new Set([sectionsData[0].title]));
       const canvasRef = useRef(null);
       const sigPad = useRef(null);
 
       useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async u => {
-            if (u) { setUser(u); db.collection("branches").orderBy("name").onSnapshot(s => setBranches(s.docs.map(d => d.data().name))); }
+            if (u) {
+                setUser(u);
+                db.collection("branches").orderBy("name").onSnapshot(s => setBranches(s.docs.map(d => d.data().name)));
+            }
             setLoading(false);
         });
         return () => unsubscribe();
@@ -103,10 +134,10 @@
             const img = new Image(); img.src = e.target.result;
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              const MAX_W = 180; const scale = MAX_W / img.width;
+              const MAX_W = 200; const scale = MAX_W / img.width;
               canvas.width = MAX_W; canvas.height = img.height * scale;
               const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              resolve(canvas.toDataURL('image/jpeg', 0.1));
+              resolve(canvas.toDataURL('image/jpeg', 0.15));
             };
           };
         });
@@ -118,34 +149,34 @@
         setPhotos(prev => ({...prev, [id]: [...(prev[id] || []), compressed]}));
       };
 
-      // --- وظيفة المعاينة مع "فلترة الأقسام الفارغة" ---
+      // --- وظيفة الـ PDF الاحترافية (تظهر فقط ما تم الإجابة عليه) ---
       const handlePreview = () => {
         if (!branch) return alert("اختر المنشأة أولاً");
         const score = Math.round(Object.values(answers).filter(v => v === 'yes').length / (Object.values(answers).filter(v => v !== 'na').length || 1) * 100);
-        const signatureImg = sigPad.current && !sigPad.current.isEmpty() ? sigPad.current.toDataURL() : "";
+        const signatureImg = sigPad.current ? sigPad.current.toDataURL() : "";
         const timestamp = new Date().toLocaleString('en-GB');
 
-        // بناء المحتوى مع الفلترة: يظهر فقط القسم الذي تم الإجابة على بند واحد منه على الأقل
         let reportHTML = "";
         sectionsData.forEach(sec => {
-            const answeredInThisSection = sec.items.filter(i => answers[i.id]);
+            const answeredItems = sec.items.filter(i => answers[i.id]);
             
-            if (answeredInThisSection.length > 0) {
-                // إضافة عنوان القسم فقط إذا كان هناك إجابات
+            if (answeredItems.length > 0) {
+                // إضافة عنوان القسم
                 reportHTML += `<div style="background:#f0fdf4; padding:10px; border-right:10px solid #d1ba89; color:#004b47; font-weight:bold; margin-top:25px; text-align:right; font-size:18px; clear:both; page-break-inside:avoid;">${sec.title}</div>`;
                 
-                answeredInThisSection.forEach(i => {
+                // إضافة البنود المجاب عليها فقط
+                answeredItems.forEach(i => {
                     const ans = answers[i.id];
                     const note = notes[i.id] || "";
                     const pics = photos[i.id] || [];
                     const statusColor = ans === 'yes' ? '#1C780B' : ans === 'no' ? '#D91414' : '#64748b';
 
                     reportHTML += `
-                    <div style="padding:15px; border-bottom:1px solid #f1f5f9; text-align:right; page-break-inside:avoid; display:block; clear:both; width:100%; box-sizing:border-box;">
+                    <div style="padding:15px; border-bottom: 1px solid #f1f5f9; text-align: right; page-break-inside: avoid; display: block; clear: both; width: 100%;">
                         <div style="font-weight:900; font-size:14px; color:#1e293b; line-height:1.6; margin-bottom:10px;">${i.ar}</div>
                         <div style="margin-bottom:10px;"><span style="font-size:12px; color:${statusColor}; font-weight:bold; background:${statusColor}10; padding:4px 12px; border-radius:6px;">الحالة: ${ans === 'yes' ? 'مطابق ✅' : 'مخالفة ❌'}</span></div>
                         ${note ? `<div style="background:#fff9e6; padding:10px; border-radius:8px; font-size:11px; border:1px solid #fde68a; margin-bottom:15px; color:#92400e;"><b>الملاحظة:</b> ${note}</div>` : ""}
-                        <div style="width:100%; display:block; text-align:right; clear:both;">
+                        <div style="width:100%; display:block;">
                             ${pics.map(p => `<div style="display:inline-block; width:30%; margin-left:1%; margin-bottom:10px;"><img src="${p}" style="width:100%; height:150px; object-fit:cover; border-radius:12px; border:2px solid #eee;" /></div>`).join('')}
                         </div>
                     </div>`;
@@ -157,7 +188,7 @@
           <div style="width:800px; margin:0 auto; padding:40px; background:white; direction:rtl; text-align:right; font-family:sans-serif;">
             <table style="width:100%; margin-bottom:20px;">
                 <tr>
-                    <td style="text-align:right;"><div style="color:#004b47; font-size:28px; font-weight:900; border-bottom:5px solid #d1ba89; display:inline-block;">تقرير تدقيق الجودة</div></td>
+                    <td style="text-align:right;"><div style="color:#004b47; font-size:32px; font-weight:900; border-bottom:5px solid #d1ba89; display:inline-block; padding-bottom:10px;">تقرير تدقيق الجودة الرسمي</div></td>
                     <td style="text-align:left; width:120px;"><img src="${LOGO_URL}" style="height:80px;" /></td>
                 </tr>
             </table>
@@ -179,12 +210,12 @@
             </div>
           </div>`;
 
-        const opt = { margin:10, filename:`Quality_${branch}.pdf`, image:{type:'jpeg', quality:1.0}, html2canvas:{scale:1.0, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} };
-        alert("جاري إنشاء تقرير البنود المجاب عليها فقط...");
+        const opt = { margin:10, filename:`Quality_Report.pdf`, image:{type:'jpeg', quality:1.0}, html2canvas:{scale:1.0, useCORS:true}, jsPDF:{unit:'mm', format:'a4', orientation:'portrait'} };
+        alert("جاري إنشاء التقرير المفلتر...");
         html2pdf().from(htmlTemplate).set(opt).save();
       };
 
-      if (loading) return <div className="h-screen flex items-center justify-center font-black animate-pulse">VERRA QUALITY SYSTEM...</div>;
+      if (loading) return <div className="h-screen flex items-center justify-center font-black animate-pulse text-[#004b47]">VERRA QUALITY...</div>;
       if (!user) return <div className="p-20 text-center font-bold">يرجى تسجيل الدخول.</div>;
 
       return (
@@ -217,7 +248,7 @@
                 </div>
                 {expanded.has(sec.title) && sec.items.map(i => (
                   <div key={i.id} className="item-card">
-                    <p className="font-bold text-gray-800 mb-2 leading-relaxed">{i.ar}</p>
+                    <p className="font-bold text-gray-800 mb-2 leading-relaxed">{i.id}. {i.ar}</p>
                     <div className="flex gap-2 justify-end mb-4">
                       <button onClick={()=>setAnswers({...answers, [i.id]:'yes'})} className={`ans-btn ${answers[i.id]==='yes'?'active btn-yes':''}`}>نعم</button>
                       <button onClick={()=>setAnswers({...answers, [i.id]:'no'})} className={`ans-btn ${answers[i.id]==='no'?'active btn-no':''}`}>لا</button>
@@ -225,7 +256,7 @@
                     </div>
                     <textarea className="notes-input" placeholder="ملاحظات..." value={notes[i.id]||""} onChange={e=>setNotes({...notes, [i.id]:e.target.value})} />
                     <div className="mt-4 flex flex-wrap gap-2 items-center justify-end">
-                        <label className="upload-btn">📷 إضافة صورة<input type="file" className="hidden" accept="image/*" onChange={e => handlePhoto(i.id, e)} /></label>
+                        <label className="upload-btn cursor-pointer">📷 إضافة صورة<input type="file" className="hidden" accept="image/*" onChange={e => handlePhoto(i.id, e)} /></label>
                         <div className="flex flex-wrap mr-auto">
                           {(photos[i.id] || []).map((img, idx) => (
                             <div key={idx} className="relative m-1"><img src={img} className="photo-thumb" /></div>
@@ -236,7 +267,7 @@
                 ))}
               </div>
             ))}
-
+            
             <div className="item-card p-10 border-2 border-dashed border-gray-300 text-center shadow-inner">
                 <h3 className="font-black text-green-900 mb-4">توقيع المفتش المعتمد</h3>
                 <canvas ref={canvasRef} className="w-full h-40 bg-gray-50 rounded-2xl border"></canvas>
